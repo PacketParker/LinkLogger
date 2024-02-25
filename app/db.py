@@ -1,6 +1,12 @@
 import sqlalchemy
+import os
 
-engine = sqlalchemy.create_engine('sqlite:///data.db')
+try:
+    os.mkdir('data')
+except FileExistsError:
+    pass
+engine = sqlalchemy.create_engine('sqlite:///data/data.db')
+
 
 def init_db():
     with engine.begin() as conn:
