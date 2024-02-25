@@ -18,8 +18,7 @@ services:
     linklogger:
         container_name: linklogger
         image: packetparker/linklogger
-        ports:
-            - 5252:5252
+        network_mode: host
         environment:
             - BASE_URL=https://your.domain
             - IP_TO_LOCATION=True
