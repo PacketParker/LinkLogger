@@ -50,7 +50,7 @@ def log(link, request):
         if ip_to_location == 'TRUE':
             # Get IP to GEO via IP2Location.io
             try:
-                data = ipgeolocation.lookup(request.remote_addr)
+                data = ipgeolocation.lookup(request.access_route[-1])
                 location = f'{data["country_name"]}, {data["city_name"]}'
                 isp = data['as']
             # Fatal error, API key is invalid or out of requests, quit
@@ -63,7 +63,7 @@ def log(link, request):
             isp = '-'
 
         timestamp = datetime.datetime.now()
-        ip = request.remote_addr
+        ip = request.access_route[-1]
         user_agent = request.user_agent.string
         ua_string = user_agent_parser.Parse(user_agent)
         browser = ua_string['user_agent']['family']
