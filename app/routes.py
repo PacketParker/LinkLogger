@@ -1,7 +1,6 @@
 import flask
 import tabulate
 import sqlalchemy
-import sys
 
 from db import engine
 from auth import auth
@@ -12,8 +11,8 @@ from func.delete_link import delete_link
 from func.renew_link import renew_link
 from func.link_records import link_records
 
-app = flask.Flask(__name__)
 
+app = flask.Flask(__name__)
 
 @app.route('/signup', methods=['GET'])
 def signup():
