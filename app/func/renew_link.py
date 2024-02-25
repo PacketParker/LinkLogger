@@ -16,8 +16,7 @@ def renew_link(link, owner):
 
     if owner == link_owner:
         with engine.begin() as conn:
-            expire_date = (datetime.datetime.now() + datetime.timedelta(days=7)).strftime('%d/%m/%Y')
-            expire_date = datetime.datetime.strptime(expire_date, '%d/%m/%Y')
+            expire_date = datetime.datetime.date(datetime.datetime.now()) + datetime.timedelta(days=7)
             conn.execute(sqlalchemy.text('UPDATE links SET expire_date = :expire_date WHERE link = :link'), [{'expire_date': expire_date, 'link': link}])
             return f'Link renewed, now expires on {expire_date}', 200
     else:
