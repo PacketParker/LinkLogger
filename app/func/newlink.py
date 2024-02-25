@@ -29,7 +29,9 @@ def generate_link(request, owner):
         while True:
             try:
                 link = ''.join(random.choices(choices, k=5))
-                conn.execute(sqlalchemy.text('INSERT INTO links(owner, link, redirect_link, expire_date) VALUES (:owner, :link, :redirect_link, :expire_date)'), [{'owner': owner, 'link': link, 'redirect_link': redirect_link, 'expire_date': (datetime.datetime.now() + datetime.timedelta(days=7)).strftime('%d/%m/%Y')}])
+                expire_date = (datetime.datetime.now() + datetime.timedelta(days=7)).strftime('%d/%m/%Y')
+                expire_date = datetime.datetime.strptime(expire_date, '%d/%m/%Y')
+                conn.execute(sqlalchemy.text('INSERT INTO links(owner, link, redirect_link, expire_date) VALUES (:owner, :link, :redirect_link, :expire_date)'), [{'owner': owner, 'link': link, 'redirect_link': redirect_link, 'expire_date': expire_date}])
                 conn.commit()
                 break
             except exc.IntegrityError:
