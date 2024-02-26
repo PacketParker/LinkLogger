@@ -10,7 +10,7 @@ auth = HTTPTokenAuth(scheme='Bearer')
 def verify_token(token):
     try:
         with engine.begin() as conn:
-            token = conn.execute(sqlalchemy.text('SELECT * FROM accounts WHERE account_name = :account_name'), [{'account_name': token}]).fetchone()
+            token = conn.execute(sqlalchemy.text('SELECT * FROM accounts WHERE api_key = :api_key'), [{'api_key': token}]).fetchone()
             return token[0]
     except TypeError:
         return False

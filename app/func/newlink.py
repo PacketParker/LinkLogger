@@ -11,18 +11,9 @@ from db import engine
 Generate and return a new randomized link that is connected to the user
 Links are composed of 5 uppercase ASCII characters + numbers
 """
-def generate_link(request, owner):
-    content_type = request.headers.get('Content-Type')
-    if content_type == 'application/json':
-        try:
-            redirect_link = request.json['redirect_link']
-        except KeyError:
-            return 'Redirect link not provided', 400
-
-        if not validators.url(redirect_link):
-            return 'Redirect link is malformed. Please try again', 400
-    else:
-        return 'Content-Type not supported', 400
+def generate_link(redirect_link, owner):
+    if not validators.url(redirect_link):
+        return None
 
     with engine.begin() as conn:
         choices = string.ascii_uppercase + '1234567890'
@@ -36,4 +27,4 @@ def generate_link(request, owner):
             except exc.IntegrityError:
                 continue
 
-    return link, 200
+    return link, expire_date

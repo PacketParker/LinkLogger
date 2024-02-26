@@ -13,7 +13,7 @@ def init_db():
         conn.execute(sqlalchemy.text(
             '''
             CREATE TABLE IF NOT EXISTS accounts (
-                account_name, PRIMARY KEY (account_name)
+                api_key, PRIMARY KEY (api_key)
             )
             '''
         ))
@@ -21,7 +21,7 @@ def init_db():
             '''
             CREATE TABLE IF NOT EXISTS links (
                 owner, link, redirect_link, expire_date,
-                FOREIGN KEY (owner) REFERENCES accounts(account_name), PRIMARY KEY (link)
+                FOREIGN KEY (owner) REFERENCES accounts(api_key), PRIMARY KEY (link)
             )
             '''
         ))

@@ -15,7 +15,7 @@ def generate_account():
         while True:
             try:
                 account_string = ''.join(random.choices(string.ascii_uppercase, k=20))
-                conn.execute(sqlalchemy.text('INSERT INTO accounts(account_name) VALUES(:account_name)'), [{'account_name': account_string}])
+                conn.execute(sqlalchemy.text('INSERT INTO accounts(api_key) VALUES(:api_key)'), [{'api_key': account_string}])
                 conn.commit()
                 break
             except exc.IntegrityError:
