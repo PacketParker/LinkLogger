@@ -109,3 +109,14 @@ curl -X POST \
     https://link.pkrm.dev/<link>/records
 ```
 
+#### Delete link records
+##### Delete all of the IP logs that are associated with a specific link
+```http
+POST /<link>/records
+```
+```curl
+curl -X POST \
+    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
+    https://link.pkrm.dev/<link>/delrecords
+```
+
