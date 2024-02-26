@@ -92,7 +92,7 @@ def records_link(link):
         return flask.jsonify(msg=response[0]), response[1]
 
 
-@app.route('/<link>/records', methods=['POST'])
+@app.route('/<link>/delrecords', methods=['POST'])
 def records_delete(link):
     response = del_link_records(link, auth.current_user())
     return flask.jsonify(msg=response[0]), response[1]
