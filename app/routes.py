@@ -10,6 +10,7 @@ from func.log import log
 from func.delete_link import delete_link
 from func.renew_link import renew_link
 from func.link_records import link_records
+from func.del_link_records import del_link_records
 
 
 app = flask.Flask(__name__)
@@ -89,3 +90,9 @@ def records_link(link):
         return response[0], response[1]
     else:
         return flask.jsonify(msg=response[0]), response[1]
+
+
+@app.route('/<link>/records', methods=['POST'])
+def records_delete(link):
+    response = del_link_records(link, auth.current_user())
+    return flask.jsonify(msg=response[0]), response[1]
