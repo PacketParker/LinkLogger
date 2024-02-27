@@ -1,7 +1,7 @@
 
 # LinkLogger API
 
-A simple API for you to create redirect links on my domain (link.pkrm.dev) and log all IPs that click on the link. Essentially a CLI-only version of Grabify.
+A simple API for you to create redirect links on my domain (link.pkrm.dev) and log all IPs that click on the link. Essentially just grabify with no GUI.
 
 Feel free to submit an issue for any problems you experience or if you have an idea for a new feature. If you have a fix for anything, please submit a pull request for review.
 
@@ -35,88 +35,4 @@ API_KEY | IP2Location.io API Key | **Required** *unless IP_TO_LOCATION is "False
 
 ## API Reference
 
-#### Create account/api key
-##### Your account name functions as your API key and will only be provided to you once.
-```http
-GET /signup
-```
-```curl
-curl https://link.pkrm.dev/signup
-```
-
-#### Create new link
-##### Creates a randomized short link that will redirect to the link you provide while logging the IP of the visitor
-```http
-POST /newlink
-```
-```curl
-curl -X POST \
-    -H "Content-type: application/json" \
-    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
-    -d '{"redirect_link": "YOUR_LINK_OF_CHOICE"}' \
-    https://link.pkrm.dev/newlink
-```
-
-#### Get all links
-##### Retrieve all of the links and their expiry dates associated with your account
-```curl
-curl -X POST \
-    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
-    https://link.pkrm.dev/links
-```
-
-#### Get all logs
-##### Retrieve all IP logs associated with every link on your account
-```http
-POST /records
-```
-```curl
-curl -X POST \
-    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
-    https://link.pkrm.dev/records
-```
-
-#### Delete link
-##### Delete the specified link as well as all records associated with it
-```http
-POST /<link>/records
-```
-```curl
-curl -X POST \
-    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
-    https://link.pkrm.dev/<link>/delete
-```
-
-#### Renew link
-##### Add 7 more days (from the current date) to the expiry value of the link
-```http
-POST /<link>/Renew
-```
-```curl
-curl -X POST \
-    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
-    https://link.pkrm.dev/<link>/renew
-```
-
-#### Link records
-##### Retrieve all IP logs associated with the link
-```http
-POST /<link>/records
-```
-```curl
-curl -X POST \
-    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
-    https://link.pkrm.dev/<link>/records
-```
-
-#### Delete link records
-##### Delete all of the IP logs that are associated with a specific link
-```http
-POST /<link>/records
-```
-```curl
-curl -X POST \
-    -H "Authorization: Bearer YOUR_ACCOUNT_NAME" \
-    https://link.pkrm.dev/<link>/delrecords
-```
-
+#### View the API reference and try out the endpoints at the [docs page](https://link.pkrm.dev/docs)

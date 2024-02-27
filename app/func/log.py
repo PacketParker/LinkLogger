@@ -39,7 +39,7 @@ ipgeolocation = ip2locationio.IPGeolocation(configuration)
 """
 Create a new log record whenever a link is visited
 """
-def log(link, request):
+def log(link, ip, user_agent):
     with engine.begin() as conn:
         try:
             redirect_link, owner = conn.execute(sqlalchemy.text('SELECT redirect_link, owner FROM links WHERE link = :link'), [{'link': link}]).fetchone()
@@ -50,7 +50,7 @@ def log(link, request):
         if ip_to_location == 'TRUE':
             # Get IP to GEO via IP2Location.io
             try:
-                data = ipgeolocation.lookup(request.access_route[-1])
+                data = ipgeolocation.lookup(ip)
                 location = f'{data["country_name"]}, {data["city_name"]}'
                 isp = data['as']
             # Fatal error, API key is invalid or out of requests, quit
@@ -63,8 +63,6 @@ def log(link, request):
             isp = '-'
 
         timestamp = datetime.datetime.now()
-        ip = request.access_route[-1]
-        user_agent = request.user_agent.string
         ua_string = user_agent_parser.Parse(user_agent)
         browser = ua_string['user_agent']['family']
         os = f'{ua_string["os"]["family"]} {ua_string["os"]["major"]}'

@@ -17,7 +17,8 @@ def remove_old_data():
         link = row.link
         delete_links.append({'link': link})
 
-    with engine.begin() as conn:
-        conn.execute(sqlalchemy.text('DELETE FROM links WHERE link = :link'), delete_links)
-        conn.execute(sqlalchemy.text('DELETE FROM records WHERE link = :link'), delete_links)
-        conn.commit()
+    if delete_links:
+        with engine.begin() as conn:
+            conn.execute(sqlalchemy.text('DELETE FROM links WHERE link = :link'), delete_links)
+            conn.execute(sqlalchemy.text('DELETE FROM records WHERE link = :link'), delete_links)
+            conn.commit()

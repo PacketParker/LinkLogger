@@ -13,7 +13,7 @@ Links are composed of 5 uppercase ASCII characters + numbers
 """
 def generate_link(redirect_link, owner):
     if not validators.url(redirect_link):
-        return None
+        return 422
 
     with engine.begin() as conn:
         choices = string.ascii_uppercase + '1234567890'
