@@ -1,5 +1,6 @@
 import fastapi
 from fastapi import Security, HTTPException, Request
+from starlette.responses import RedirectResponse
 import pydantic
 import sqlalchemy
 
@@ -192,3 +193,9 @@ async def link_delrecords(link: str, api_key: str = Security(check_api_key)):
         )
     else:
         return {"link": f"The records for link {data} have been deleted"}
+
+
+# Redirect / -> /docs
+@app.get("/", summary="Redirect to the Swagger UI documentation")
+async def redirect_to_docs():
+    return RedirectResponse(url="/docs")
