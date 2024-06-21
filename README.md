@@ -17,7 +17,7 @@ version: '3.3'
 services:
     linklogger:
         container_name: linklogger
-        image: packetparker/linklogger
+        image: ghcr.io/packetparker/linklogger:latest
         network_mode: host
         environment:
             - BASE_URL=https://your.domain
