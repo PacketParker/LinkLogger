@@ -34,7 +34,7 @@ View the API reference and try out the endpoints at the [docs page](https://link
 ## Bare metal
 To run LinkLogger on bare metal, follow the steps below.
 
-*NOTE: For information on each configuration variable, look at the `Configuration` section of this page.
+*NOTE: For information on each configuration variable, look at the `Configuration` section of this page.*
 
 1. Install Python and Pip
 2. Clone this repository
