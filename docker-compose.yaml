@@ -1,0 +1,12 @@
+services:
+    linklogger:
+        container_name: linklogger
+        image: ghcr.io/packetparker/linklogger:latest
+        network_mode: host
+        environment:
+            - BASE_URL=https://your.domain
+            - IP_TO_LOCATION=True
+            - API_KEY=awd
+        volumes:
+            - /path/on/system:/data
+        restart: on-failure

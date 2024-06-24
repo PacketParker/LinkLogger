@@ -10,4 +10,4 @@ COPY . .
 RUN pip install -r requirements.txt
 
 ENTRYPOINT [ "python" ]
-CMD [ "-u",  "app/linklogger.py" ]
+CMD [ "-u",  "linklogger.py" ]

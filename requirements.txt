@@ -1,9 +1,13 @@
 pydantic==2.6.2
 ip2location-io==1.0.0
-python-dotenv==1.0.0
 SQLAlchemy==2.0.27
 ua-parser==0.18.0
 validators==0.22.0
 uvicorn==0.27.1
 fastapi==0.110.0
 APScheduler==3.10.4
+Flask==3.0.3
+Flask-Login==0.6.3
+a2wsgi==1.10.4
+colorlog==6.8.2
+bcrypt==4.1.3
