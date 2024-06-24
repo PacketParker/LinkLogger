@@ -6,7 +6,7 @@ services:
         environment:
             - BASE_URL=https://your.domain
             - IP_TO_LOCATION=True
-            - API_KEY=awd
+            - API_KEY=your_api_key
         volumes:
             - /path/on/system:/data
         restart: on-failure
