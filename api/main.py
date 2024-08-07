@@ -40,8 +40,7 @@ app.include_router(links_router)
 # Regenerate the API key for the user
 @app.post("/regenerate")
 async def regenerate(api_key: str = Security(check_api_key), db = Depends(get_db)):
-    print(api_key['value'])
-
+    """Regenerate the API key for the user. Requires the current API key."""
     user = db.query(User).filter(User.api_key == api_key['value']).first()
     if not user:
         raise HTTPException(status_code=401, detail="Invalid API key")
