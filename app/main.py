@@ -15,6 +15,7 @@ import random
 from models import User
 from database import *
 from app.util.log import log
+from var import BASE_URL 
 
 
 class FlaskUser(UserMixin):
@@ -140,7 +141,7 @@ Log all records for visits to shortened links
 def log_redirect(link):
     # If the `link` is more than 5 characters, ignore
     if len(link) > 5:
-        return
+        return redirect(BASE_URL)
 
     # If the `link` is one of the registered routes, ignore
     if link in ["login", "signup", "dashboard", "logout", "api"]:
