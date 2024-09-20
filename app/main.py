@@ -82,7 +82,7 @@ def signup():
         user = db.query(User).filter(User.username == username).first()
         if user:
             db.close()
-            return {"status": "User already exists"}
+            return {"status": "Username not available"}
         # Add information to the database
         hashed_password = bcrypt.hashpw(
             password.encode("utf-8"), bcrypt.gensalt()
