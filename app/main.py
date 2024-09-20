@@ -6,7 +6,7 @@ from flask_login import (
     LoginManager,
     UserMixin,
 )
-from flask import Flask, redirect, render_template, request, url_for, Request
+from flask import Flask, redirect, render_template, request, url_for
 import bcrypt
 import os
 import string
