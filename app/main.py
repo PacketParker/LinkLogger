@@ -76,6 +76,14 @@ def signup():
         username = request.form["username"]
         password = request.form["password"]
 
+        # Verify the password meets requirements
+        if len(password) < 8:
+            return {"status": "Password must be at least 8 characters"}
+        if not any(char.isdigit() for char in password):
+            return {"status": "Password must contain at least one digit"}
+        if not any(char.isupper() for char in password):
+            return {"status": "Password must contain at least one uppercase letter"}
+
         # Get database session
         db = SessionLocal()
 

@@ -7,7 +7,7 @@
 </head>
 <body>
     <div>
-        <p id="error">User already exists. Please try again</p>
+        <p id="error"></p>
         <form action="/signup" method="POST">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
@@ -15,6 +15,7 @@
         </form>
         <hr>
         <p>Already have an account? <a href="/login">Log in now</a></p>
+        <p>Passwords must be at least 8 characters long and contain a number, special character, and uppercase character.</p>
     </div>
 </body>
 </html>
@@ -33,6 +34,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
+        max-width: 330px;
     }
 
     input {
@@ -104,6 +106,7 @@
 
         if (data.status != "success") {
             document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerText = data.status;
         } else {
             window.location.href = '/dashboard';
         }
