@@ -20,10 +20,12 @@ def log(link, ip, user_agent):
 
     # Get the redirect link and owner of the link
     redirect_link, owner = (
-        db.query(Link.redirect_link, Link.owner).filter(Link.link == link).first()
+        db.query(Link.redirect_link, Link.owner)
+        .filter(Link.link == link)
+        .first()
     )
 
-    if IP_TO_LOCATION == "TRUE":
+    if IP_TO_LOCATION:
         # Get IP to GEO via IP2Location.io
         try:
             data = ipgeolocation.lookup(ip)
@@ -32,7 +34,8 @@ def log(link, ip, user_agent):
         # Fatal error, API key is invalid or out of requests, quit
         except IP2LocationIOAPIError:
             LOG.error(
-                "Invalid API key or insufficient credits. Change the `config.ini` file if you no longer need the IP2Location API feature."
+                "Invalid API key or insufficient credits. Change the"
+                " `config.ini` file if you no longer need IP geolocation."
             )
             location = "-, -"
             isp = "-"
