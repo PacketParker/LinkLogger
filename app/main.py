@@ -167,8 +167,8 @@ def log_redirect(link):
         return redirect(BASE_URL)
     else:
         # Log the visit
-        if request.headers.get("X-Forwarded-For"):
-            ip = request.headers.get("X-Forwarded-For").split(",")[0]
+        if request.headers.get("X-Real-IP"):
+            ip = request.headers.get("X-Real-IP").split(",")[0]
         else:
             ip = request.remote_addr
         user_agent = request.headers.get("User-Agent")
