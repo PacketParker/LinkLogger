@@ -55,7 +55,9 @@ def login():
         if not user:
             return {"status": "Invalid username or password"}
 
-        if bcrypt.checkpw(password.encode("utf-8"), user.password.encode("utf-8")):
+        if bcrypt.checkpw(
+            password.encode("utf-8"), user.password.encode("utf-8")
+        ):
             flask_user = FlaskUser()
             flask_user.id = username
             login_user(flask_user)
@@ -82,7 +84,9 @@ def signup():
         if not any(char.isdigit() for char in password):
             return {"status": "Password must contain at least one digit"}
         if not any(char.isupper() for char in password):
-            return {"status": "Password must contain at least one uppercase letter"}
+            return {
+                "status": "Password must contain at least one uppercase letter"
+            }
 
         # Get database session
         db = SessionLocal()
@@ -95,8 +99,12 @@ def signup():
         hashed_password = bcrypt.hashpw(
             password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
-        api_key = "".join(random.choices(string.ascii_letters + string.digits, k=20))
-        new_user = User(username=username, password=hashed_password, api_key=api_key)
+        api_key = "".join(
+            random.choices(string.ascii_letters + string.digits, k=20)
+        )
+        new_user = User(
+            username=username, password=hashed_password, api_key=api_key
+        )
         db.add(new_user)
         db.commit()
         db.close()
@@ -159,7 +167,10 @@ def log_redirect(link):
         return redirect(BASE_URL)
     else:
         # Log the visit
-        ip = request.remote_addr
+        if request.headers.get("X-Forwarded-For"):
+            ip = request.headers.get("X-Forwarded-For").split(",")[0]
+        else:
+            ip = request.remote_addr
         user_agent = request.headers.get("User-Agent")
         log(link, ip, user_agent)
         db.close()
