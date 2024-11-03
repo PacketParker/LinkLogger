@@ -154,7 +154,8 @@ Log all records for visits to shortened links
 
 
 @app.route("/<link>", methods=["GET"])
-def log_redirect(link):
+def log_redirect(link: str):
+    link = link.upper()
     # If `link` is not exactly 5 characters, return redirect to base url
     if len(link) != 5:
         return redirect(BASE_URL)

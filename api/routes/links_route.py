@@ -37,19 +37,21 @@ async def create_link(
     # Check if the URL is valid
     if not validators.url(url.url):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid URL"
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid URL",
         )
     # Create the new link and add it to the database
     while True:
         try:
             link_path = "".join(
                 random.choices(string.ascii_uppercase + "1234567890", k=5)
-            )
+            ).upper()
             new_link = Link(
                 link=link_path,
                 owner=api_key["owner"],
                 redirect_link=url.url,
-                expire_date=datetime.datetime.now() + datetime.timedelta(days=30),
+                expire_date=datetime.datetime.now()
+                + datetime.timedelta(days=30),
             )
             db.add(new_link)
             db.commit()
@@ -70,6 +72,7 @@ async def delete_link(
     db=Depends(get_db),
     api_key: str = Security(check_api_key),
 ):
+    link = link.upper()
     # Get the link and check the owner
     link = db.query(Link).filter(Link.link == link).first()
     if not link:
@@ -93,12 +96,16 @@ async def delete_link(
     return {"response": "Link successfully deleted", "link": link.link}
 
 
-@router.get("/{link}/records", summary="Get all of the IP log records associated with a link")
+@router.get(
+    "/{link}/records",
+    summary="Get all of the IP log records associated with a link",
+)
 async def get_link_records(
     link: Annotated[str, Path(title="Link to get records for")],
     db=Depends(get_db),
     api_key: str = Security(check_api_key),
 ):
+    link = link.upper()
     # Get the link and check the owner
     link = db.query(Link).filter(Link.link == link).first()
     if not link:
@@ -116,12 +123,16 @@ async def get_link_records(
     return records
 
 
-@router.delete("/{link}/records", summary="Delete all of the IP log records associated with a link")
+@router.delete(
+    "/{link}/records",
+    summary="Delete all of the IP log records associated with a link",
+)
 async def delete_link_records(
     link: Annotated[str, Path(title="Link to delete records for")],
     db=Depends(get_db),
     api_key: str = Security(check_api_key),
 ):
+    link = link.upper()
     # Get the link and check the owner
     link = db.query(Link).filter(Link.link == link).first()
     if not link:
