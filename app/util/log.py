@@ -4,7 +4,7 @@ from ua_parser import user_agent_parser
 from ip2locationio.ipgeolocation import IP2LocationIOAPIError
 
 from database import SessionLocal
-from var import LOG, API_KEY, IP_TO_LOCATION
+from config import LOG, API_KEY, IP_TO_LOCATION
 from models import Link, Record
 
 configuration = ip2locationio.Configuration(API_KEY)

@@ -15,7 +15,7 @@ import random
 from models import User, Link
 from database import *
 from app.util.log import log
-from var import BASE_URL
+from config import BASE_URL
 
 
 class FlaskUser(UserMixin):
