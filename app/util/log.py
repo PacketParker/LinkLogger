@@ -32,7 +32,17 @@ def ip_to_location(ip):
         )
         return "-, -", "-"
 
-    location = f'{data["country_name"]}, {data["city_name"]}'
+    location = ""
+    # Sometimes a certain name may not be present, so always check
+    if "city_name" in data:
+        location += data["city_name"]
+
+    if "region_name" in data:
+        location += f', {data["region_name"]}'
+
+    if "country_name" in data:
+        location += f', {data["country_name"]}'
+
     isp = data["as"]
     return location, isp
 
