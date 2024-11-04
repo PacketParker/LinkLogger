@@ -2,6 +2,7 @@ pydantic==2.6.2
 ip2location-io==1.0.0
 SQLAlchemy==2.0.27
 ua-parser==0.18.0
+validators==0.28.3
 fastapi==0.110.0
 Flask==3.0.3
 Flask-Login==0.6.3
