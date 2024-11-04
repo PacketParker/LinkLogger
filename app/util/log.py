@@ -1,14 +1,10 @@
-import ip2locationio
+import requests
 import datetime
 from ua_parser import user_agent_parser
-from ip2locationio.ipgeolocation import IP2LocationIOAPIError
 
 from database import SessionLocal
 import config
 from models import Link, Record
-
-configuration = ip2locationio.Configuration(config.API_KEY)
-ipgeolocation = ip2locationio.IPGeolocation(configuration)
 
 """
 Create a new log record whenever a link is visited
@@ -28,14 +24,19 @@ def log(link, ip, user_agent):
     if config.IP_TO_LOCATION:
         # Get IP to GEO via IP2Location.io
         try:
-            data = ipgeolocation.lookup(ip)
-            location = f'{data["country_name"]}, {data["city_name"]}'
-            isp = data["as"]
-        # Fatal error, API key is invalid or out of requests, quit
-        except IP2LocationIOAPIError:
+            url = f"https://api.ip2location.io/?key={config.API_KEY}&ip={ip}"
+            data = requests.get(url).json()
+            if "error" in data:
+                raise Exception("Error")
+            else:
+                location = f'{data["country_name"]}, {data["city"]}'
+                isp = data["as"]
+
+        # Fatal error, maybe API is down?
+        except:
             config.LOG.error(
-                "Invalid API key or insufficient credits. Change the"
-                " `config.ini` file if you no longer need IP geolocation."
+                "Error with IP2Location API. Likely wrong API key or"
+                " insufficient credits."
             )
             location = "-, -"
             isp = "-"
