@@ -21,28 +21,24 @@ def log(link, ip, user_agent):
         .first()
     )
 
-    if config.IP_TO_LOCATION:
-        # Get IP to GEO via IP2Location.io
-        try:
-            url = f"https://api.ip2location.io/?key={config.API_KEY}&ip={ip}"
-            data = requests.get(url).json()
-            if "error" in data:
-                raise Exception("Error")
-            else:
-                location = f'{data["country_name"]}, {data["city"]}'
-                isp = data["as"]
-
-        # Fatal error, maybe API is down?
-        except:
+    if not config.IP_TO_LOCATION:
+        location = "-, -"
+        isp = "-"
+    # Get IP to GEO via IPGeolocation.io
+    else:
+        url = f"https://api.ip2location.io/?key={config.API_KEY}&ip={ip}"
+        data = requests.get(url).json()
+        print(data)
+        if "error" in data:
             config.LOG.error(
                 "Error with IP2Location API. Likely wrong API key or"
-                " insufficient credits."
+                " insufficient funds."
             )
             location = "-, -"
             isp = "-"
-    else:
-        location = "-, -"
-        isp = "-"
+        else:
+            location = f'{data["country_name"]}, {data["city"]}'
+            isp = data["as"]
 
     timestamp = datetime.datetime.now()
     ua_string = user_agent_parser.Parse(user_agent)
