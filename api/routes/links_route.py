@@ -7,9 +7,10 @@ import datetime
 import validators
 
 from api.util.db_dependency import get_db
-from api.util.check_api_key import check_api_key
 from models import Link, Record
 from api.schemas.links_schemas import URLSchema
+from api.schemas.auth_schemas import User
+from api.util.authentication import get_current_user
 
 
 router = APIRouter(prefix="/links", tags=["links"])
@@ -17,10 +18,10 @@ router = APIRouter(prefix="/links", tags=["links"])
 
 @router.get("/", summary="Get all of the links associated with your account")
 async def get_links(
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
-    api_key: str = Security(check_api_key),
 ):
-    links = db.query(Link).filter(Link.owner == api_key["owner"]).all()
+    links = db.query(Link).filter(Link.owner == current_user.id).all()
     if not links:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No links found"
@@ -31,8 +32,8 @@ async def get_links(
 @router.post("/", summary="Create a new link")
 async def create_link(
     url: URLSchema,
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
-    api_key: str = Security(check_api_key),
 ):
     # Check if the URL is valid
     if not validators.url(url.url):
@@ -48,7 +49,7 @@ async def create_link(
             ).upper()
             new_link = Link(
                 link=link_path,
-                owner=api_key["owner"],
+                owner=current_user.id,
                 redirect_link=url.url,
                 expire_date=datetime.datetime.now()
                 + datetime.timedelta(days=30),
@@ -69,8 +70,8 @@ async def create_link(
 @router.delete("/{link}", summary="Delete a link")
 async def delete_link(
     link: Annotated[str, Path(title="Link to delete")],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
-    api_key: str = Security(check_api_key),
 ):
     link = link.upper()
     # Get the link and check the owner
@@ -79,7 +80,7 @@ async def delete_link(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
         )
-    if link.owner != api_key["owner"]:
+    if link.owner != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Link not associated with your account",
@@ -102,8 +103,8 @@ async def delete_link(
 )
 async def get_link_records(
     link: Annotated[str, Path(title="Link to get records for")],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
-    api_key: str = Security(check_api_key),
 ):
     link = link.upper()
     # Get the link and check the owner
@@ -112,7 +113,7 @@ async def get_link_records(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
         )
-    if link.owner != api_key["owner"]:
+    if link.owner != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Link not associated with your account",
@@ -129,8 +130,8 @@ async def get_link_records(
 )
 async def delete_link_records(
     link: Annotated[str, Path(title="Link to delete records for")],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
-    api_key: str = Security(check_api_key),
 ):
     link = link.upper()
     # Get the link and check the owner
@@ -139,7 +140,7 @@ async def delete_link_records(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
         )
-    if link.owner != api_key["owner"]:
+    if link.owner != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Link not associated with your account",
