@@ -4,10 +4,10 @@ from ua_parser import user_agent_parser
 from ip2locationio.ipgeolocation import IP2LocationIOAPIError
 
 from database import SessionLocal
-from config import LOG, API_KEY, IP_TO_LOCATION
+import config
 from models import Link, Record
 
-configuration = ip2locationio.Configuration(API_KEY)
+configuration = ip2locationio.Configuration(config.API_KEY)
 ipgeolocation = ip2locationio.IPGeolocation(configuration)
 
 """
@@ -25,7 +25,7 @@ def log(link, ip, user_agent):
         .first()
     )
 
-    if IP_TO_LOCATION:
+    if config.IP_TO_LOCATION:
         # Get IP to GEO via IP2Location.io
         try:
             data = ipgeolocation.lookup(ip)
@@ -33,7 +33,7 @@ def log(link, ip, user_agent):
             isp = data["as"]
         # Fatal error, API key is invalid or out of requests, quit
         except IP2LocationIOAPIError:
-            LOG.error(
+            config.LOG.error(
                 "Invalid API key or insufficient credits. Change the"
                 " `config.ini` file if you no longer need IP geolocation."
             )

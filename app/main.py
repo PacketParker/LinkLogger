@@ -15,7 +15,6 @@ import random
 from models import User, Link
 from database import *
 from app.util.log import log
-from config import BASE_URL
 
 
 class FlaskUser(UserMixin):
@@ -158,14 +157,14 @@ def log_redirect(link: str):
     link = link.upper()
     # If `link` is not exactly 5 characters, return redirect to base url
     if len(link) != 5:
-        return redirect(BASE_URL)
+        return redirect(url_for("login"))
 
     # Make sure the link exists in the database
     db = SessionLocal()
     link_record = db.query(Link).filter(Link.link == link).first()
     if not link_record:
         db.close()
-        return redirect(BASE_URL)
+        return redirect(url_for("login"))
     else:
         # Log the visit
         if request.headers.get("X-Real-IP"):

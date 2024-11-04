@@ -51,6 +51,5 @@ Below are all of the configuration variables that are used within LinkLogger.
 
 Variable | Description | Requirement
 ---|---|---
-BASE_URL | `URL`: Redirect URL for when people visit old, dead, or non-existant links | **Required**
 IP_TO_LOCATION | `BOOLEAN`:  Whether or not you want toe IP to Location feature <br> *(requires IP2Location.io account)* | **Required**
 API_KEY | `KEY`: IP2Location.io API Key | **Required** *only if IP_TO_LOCATION is set to True*

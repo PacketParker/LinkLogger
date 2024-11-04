@@ -4,7 +4,6 @@ services:
         image: ghcr.io/packetparker/linklogger:latest
         network_mode: host
         environment:
-            - BASE_URL=https://your.domain
             - IP_TO_LOCATION=True
             - API_KEY=your_api_key
         volumes:

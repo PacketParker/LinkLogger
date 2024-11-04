@@ -1,7 +1,6 @@
 import jsonschema
 import os
 import yaml
-import validators
 import sys
 import logging
 from colorlog import ColoredFormatter
@@ -23,7 +22,6 @@ LOG = logging.getLogger("pythonConfig")
 LOG.setLevel(log_level)
 LOG.addHandler(stream)
 
-BASE_URL = None
 IP_TO_LOCATION = None
 API_KEY = None
 
@@ -33,11 +31,10 @@ schema = {
         "config": {
             "type": "object",
             "properties": {
-                "base_url": {"type": "string"},
                 "ip_to_location": {"type": "boolean"},
                 "api_key": {"type": "string"},
             },
-            "required": ["base_url", "ip_to_location"],
+            "required": ["ip_to_location"],
         }
     },
     "required": ["config"],
@@ -61,7 +58,6 @@ def load_config():
         with open(file_path, "w") as f:
             f.write(
                 """
-            base_url: ""
             ip_to_location: ""
             api_key: ""
             """
@@ -75,7 +71,7 @@ def load_config():
 
 # Validate the options within config.yaml
 def validate_config(file_contents):
-    global BASE_URL, IP_TO_LOCATION, API_KEY
+    global IP_TO_LOCATION, API_KEY
     config = yaml.safe_load(file_contents)
 
     try:
@@ -83,12 +79,6 @@ def validate_config(file_contents):
     except jsonschema.ValidationError as e:
         LOG.error(e.message)
         sys.exit()
-
-    # Validate BASE_URL
-    if not validators.url(config["config"]["base_url"]):
-        LOG.error("BASE_URL is not a valid URL")
-    else:
-        BASE_URL = config["config"]["base_url"]
 
     # Make IP_TO_LOCATION a boolean
     IP_TO_LOCATION = bool(config["config"]["ip_to_location"])
