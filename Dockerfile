@@ -1,8 +1,7 @@
 FROM python:3.11-slim
 
-LABEL org.opencontainers.image.source = "https://github.com/PacketParker/LinkLogger"
-
-MAINTAINER "parker <mailto:contact@pkrm.dev>"
+LABEL org.opencontainers.image.source="https://github.com/PacketParker/LinkLogger"
+LABEL maintainer="parker <mailto:contact@pkrm.dev>"
 
 WORKDIR /
 

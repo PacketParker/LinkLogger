@@ -3,9 +3,6 @@ services:
         container_name: linklogger
         image: ghcr.io/packetparker/linklogger:latest
         network_mode: host
-        environment:
-            - IP_TO_LOCATION=True
-            - API_KEY=your_api_key
         volumes:
             - /path/on/system:/data
         restart: on-failure
