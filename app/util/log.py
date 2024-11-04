@@ -11,6 +11,32 @@ Create a new log record whenever a link is visited
 """
 
 
+def ip_to_location(ip):
+    if not config.IP_TO_LOCATION:
+        return "-, -", "-"
+
+    url = f"https://api.ip2location.io/?key={config.API_KEY}&ip={ip}"
+    response = requests.get(url)
+    data = response.json()
+
+    if response.status_code != 200:
+        config.LOG.error(
+            "Error with IP2Location API. Perhaps the API is down."
+        )
+        return "-, -", "-"
+
+    if "error" in data:
+        config.LOG.error(
+            "Error with IP2Location API. Likely wrong API key or insufficient"
+            " funds."
+        )
+        return "-, -", "-"
+
+    location = f'{data["country_name"]}, {data["city_name"]}'
+    isp = data["as"]
+    return location, isp
+
+
 def log(link, ip, user_agent):
     db = SessionLocal()
 
@@ -21,24 +47,8 @@ def log(link, ip, user_agent):
         .first()
     )
 
-    if not config.IP_TO_LOCATION:
-        location = "-, -"
-        isp = "-"
-    # Get IP to GEO via IPGeolocation.io
-    else:
-        url = f"https://api.ip2location.io/?key={config.API_KEY}&ip={ip}"
-        data = requests.get(url).json()
-        print(data)
-        if "error" in data:
-            config.LOG.error(
-                "Error with IP2Location API. Likely wrong API key or"
-                " insufficient funds."
-            )
-            location = "-, -"
-            isp = "-"
-        else:
-            location = f'{data["country_name"]}, {data["city"]}'
-            isp = data["as"]
+    # Get the location and ISP of the user
+    location, isp = ip_to_location(ip)
 
     timestamp = datetime.datetime.now()
     ua_string = user_agent_parser.Parse(user_agent)
