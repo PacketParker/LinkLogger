@@ -11,7 +11,7 @@ import jwt
 from app.util.db_dependency import get_db
 from sqlalchemy.orm import sessionmaker
 from app.schemas.auth_schemas import *
-from models import User as UserDB
+from models import User as UserModel
 
 secret_key = random.randbytes(32)
 algorithm = "HS256"
@@ -32,7 +32,7 @@ def get_user(db, username: str):
     """
     Get the user object from the database
     """
-    user = db.query(UserDB).filter(UserDB.username == username).first()
+    user = db.query(UserModel).filter(UserModel.username == username).first()
     if user:
         return UserInDB(**user.__dict__)
 
@@ -79,7 +79,8 @@ async def get_current_user_from_cookie(
 
 
 async def get_current_user_from_token(
-    token: Annotated[str, Depends(oauth2_scheme)], db=Depends(get_db)
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db=Depends(get_db),
 ):
     return await get_current_user(token, db=db)
 
@@ -88,7 +89,8 @@ async def get_current_user_from_token(
 # `refresh_get_current_user` is only called from /refresh
 # and alerts `get_current_user` that it should expect a refresh token
 async def refresh_get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], db=Depends(get_db)
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db=Depends(get_db),
 ):
     return await get_current_user(token, is_refresh=True, db=db)
 
@@ -97,7 +99,7 @@ async def get_current_user(
     token: str,
     is_refresh: bool = False,
     is_ui: bool = False,
-    db: Optional[sessionmaker] = None,
+    db: sessionmaker = None,
 ):
     """
     Return the current user based on the token

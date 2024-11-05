@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Path, Depends, Request
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from app.routes.links_route import router as links_router
+from app.routes.links_routes import router as links_router
 from app.routes.refresh_route import router as refresh_router
 from app.routes.token_route import router as token_router
+from app.routes.user_routes import router as user_router
 from typing import Annotated
 from fastapi.exceptions import HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
@@ -41,6 +42,7 @@ app.include_router(links_router, prefix="/api")
 # prefix in order to keep logging in via Swagger UI working
 app.include_router(token_router)
 app.include_router(refresh_router, prefix="/api")
+app.include_router(user_router, prefix="/api")
 
 
 @app.get("/login")

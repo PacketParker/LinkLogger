@@ -60,11 +60,7 @@ async def create_link(
         except:
             continue
 
-    return {
-        "response": "Link successfully created",
-        "expire_date": new_link.expire_date,
-        "link": new_link.link,
-    }
+    return new_link
 
 
 @router.delete("/{link}", summary="Delete a link")
@@ -94,7 +90,7 @@ async def delete_link(
     db.delete(link)
     db.commit()
 
-    return {"response": "Link successfully deleted", "link": link.link}
+    return status.HTTP_204_NO_CONTENT
 
 
 @router.get(
@@ -152,4 +148,4 @@ async def delete_link_records(
         db.delete(record)
     db.commit()
 
-    return {"response": "Records successfully deleted", "link": link.link}
+    return status.HTTP_204_NO_CONTENT

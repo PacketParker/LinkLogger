@@ -44,11 +44,17 @@ async def login_for_access_token(
         data={"sub": user.username, "refresh": True},
         expires_delta=refresh_token_expires,
     )
-    response = JSONResponse(content={"success": True})
-    response.set_cookie(
-        key="access_token", value=access_token, httponly=True, samesite="lax"
+    # response = JSONResponse(content={"success": True})
+    # response.set_cookie(
+    #     key="access_token", value=access_token, httponly=True, samesite="lax"
+    # )
+    # response.set_cookie(
+    #     key="refresh_token", value=refresh_token, httponly=True, samesite="lax"
+    # )
+
+    # For Swagger UI to work, must return the token
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
     )
-    response.set_cookie(
-        key="refresh_token", value=refresh_token, httponly=True, samesite="lax"
-    )
-    return response

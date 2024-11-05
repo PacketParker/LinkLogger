@@ -1,5 +1,4 @@
 from fastapi import Depends, APIRouter
-from fastapi.responses import RedirectResponse
 from datetime import timedelta
 from typing import Annotated
 
