@@ -34,21 +34,21 @@ async def get_links(
     username = login_data.username
     password = login_data.password
     # Make sure the password meets all of the requirements
-    if len(password) < 8:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 8 characters",
-        )
-    if not any(char.isdigit() for char in password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must contain at least one digit",
-        )
-    if not any(char.isupper() for char in password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must contain at least one uppercase letter",
-        )
+    # if len(password) < 8:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Password must be at least 8 characters",
+    #     )
+    # if not any(char.isdigit() for char in password):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Password must contain at least one digit",
+    #     )
+    # if not any(char.isupper() for char in password):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Password must contain at least one uppercase letter",
+    #     )
     # Make sure the username isn't taken
     user = db.query(UserModel).filter(UserModel.username == username).first()
     if user:
@@ -101,21 +101,21 @@ async def update_pass(
     Update the pass of the current user account
     """
     # Make sure the password meets all of the requirements
-    if len(update_data.new_password) < 8:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 8 characters",
-        )
-    if not any(char.isdigit() for char in update_data.new_password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must contain at least one digit",
-        )
-    if not any(char.isupper() for char in update_data.new_password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must contain at least one uppercase letter",
-        )
+    # if len(update_data.new_password) < 8:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Password must be at least 8 characters",
+    #     )
+    # if not any(char.isdigit() for char in update_data.new_password):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Password must contain at least one digit",
+    #     )
+    # if not any(char.isupper() for char in update_data.new_password):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Password must contain at least one uppercase letter",
+    #     )
     # Get the user and update the password
     user = db.query(UserModel).filter(UserModel.id == current_user.id).first()
     if not user:
