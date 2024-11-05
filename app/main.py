@@ -48,8 +48,15 @@ async def login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 
-# Handle login requests through Swagger UI
+@app.get("/signup")
+async def signup(request: Request):
+    return templates.TemplateResponse("signup.html", {"request": request})
 
+
+# TODO: Create users routes
+# User - register/create
+# User - delete
+# User - update
 
 # @app.route("/signup", methods=["GET", "POST"])
 # def signup():
