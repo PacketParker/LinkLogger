@@ -1,22 +1,22 @@
-from fastapi import APIRouter, status, Depends, HTTPException
-from fastapi.responses import JSONResponse, Response
-from typing import Annotated
+from fastapi import Depends, APIRouter, status, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import Response
 from datetime import timedelta
 from typing import Annotated
-from fastapi.security import OAuth2PasswordRequestForm
 
-from app.util.db_dependency import get_db
 from app.util.authentication import (
-    authenticate_user,
     create_access_token,
+    authenticate_user,
+    refresh_get_current_user,
 )
-from app.schemas.auth_schemas import Token
+from app.schemas.auth_schemas import Token, User
+from app.util.db_dependency import get_db
 
 
-router = APIRouter(prefix="/token", tags=["token"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/")
+@router.post("/token", summary="Authenticate and get an access token")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
@@ -26,6 +26,7 @@ async def login_for_access_token(
     Return an access token for the user, if the given authentication details are correct
     """
     user = authenticate_user(db, form_data.username, form_data.password)
+    print(user)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -34,14 +35,14 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=15)
     access_token = create_access_token(
-        data={"sub": user.username, "refresh": False},
+        data={"sub": user.id, "refresh": False},
         expires_delta=access_token_expires,
     )
     # Create a refresh token - just an access token with a longer expiry
     # and more restrictions ("refresh" is True)
     refresh_token_expires = timedelta(days=1)
     refresh_token = create_access_token(
-        data={"sub": user.username, "refresh": True},
+        data={"sub": user.id, "refresh": True},
         expires_delta=refresh_token_expires,
     )
     # response = JSONResponse(content={"success": True})
@@ -56,5 +57,25 @@ async def login_for_access_token(
     return Token(
         access_token=access_token,
         refresh_token=refresh_token,
+        token_type="bearer",
+    )
+
+
+# Full native JWT support is not complete in FastAPI yet :(
+# Part of that is token refresh, so we must implement it ourselves
+@router.post("/refresh")
+async def refresh_access_token(
+    current_user: Annotated[User, Depends(refresh_get_current_user)],
+) -> Token:
+    """
+    Return a new access token if the refresh token is valid
+    """
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": current_user.id, "refresh": False},
+        expires_delta=access_token_expires,
+    )
+    return Token(
+        access_token=access_token,
         token_type="bearer",
     )

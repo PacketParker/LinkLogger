@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import RedirectResponse
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta
-from typing import Annotated, Optional
+from typing import Annotated
 import jwt
 
 from app.util.db_dependency import get_db
@@ -15,7 +15,7 @@ from models import User as UserModel
 
 secret_key = random.randbytes(32)
 algorithm = "HS256"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
 """
 Helper functions for authentication
@@ -28,11 +28,11 @@ def verify_password(plain_password, hashed_password):
     )
 
 
-def get_user(db, username: str):
+def get_user(db, id: int):
     """
     Get the user object from the database
     """
-    user = db.query(UserModel).filter(UserModel.username == username).first()
+    user = db.query(UserModel).filter(UserModel.id == id).first()
     if user:
         return UserInDB(**user.__dict__)
 
@@ -120,9 +120,9 @@ async def get_current_user(
 
     try:
         payload = jwt.decode(token, secret_key, algorithms=[algorithm])
-        username: str = payload.get("sub")
+        id: int = payload.get("sub")
         refresh: bool = payload.get("refresh")
-        if username is None:
+        if not id:
             return raise_unauthorized()
         # For some reason, an access token was passed when a refresh
         # token was expected - some likely malicious activity
@@ -133,11 +133,10 @@ async def get_current_user(
         if refresh and not is_refresh:
             return raise_unauthorized()
 
-        token_data = TokenData(username=username)
     except InvalidTokenError:
         return raise_unauthorized()
 
-    user = get_user(db, username=token_data.username)
+    user = get_user(db, id)
     if user is None:
         return raise_unauthorized()
 

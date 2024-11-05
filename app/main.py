@@ -2,9 +2,8 @@ from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from app.routes.auth_routes import router as auth_router
 from app.routes.links_routes import router as links_router
-from app.routes.refresh_route import router as refresh_router
-from app.routes.token_route import router as token_router
 from app.routes.user_routes import router as user_router
 from typing import Annotated
 from fastapi.exceptions import HTTPException
@@ -35,13 +34,8 @@ app.add_middleware(
 templates = Jinja2Templates(directory="app/templates")
 
 # Import routes
+app.include_router(auth_router, prefix="/api")
 app.include_router(links_router, prefix="/api")
-# Must not have a prefix... for some reason you can't change
-# the prefix of the Swagger UI OAuth2 redirect to /api/token
-# you can only change it to /token, so we have to remove the
-# prefix in order to keep logging in via Swagger UI working
-app.include_router(token_router)
-app.include_router(refresh_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
 
 

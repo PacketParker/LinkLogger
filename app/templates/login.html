@@ -91,10 +91,12 @@
 
         const formData = new FormData(this);
         // Send POST request to /token containing form data
-        const response = await fetch('/token', {
+        const response = await fetch('/api/auth/token', {
             method: 'POST',
             body: formData
         });
+
+        console.log(await response.json());
 
         if (response.status != 200) {
             document.getElementById('error').style.display = 'block';
