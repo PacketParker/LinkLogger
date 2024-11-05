@@ -89,22 +89,20 @@
         // Prevent default form submission
         event.preventDefault();
 
-        // Get form data
         const formData = new FormData(this);
-
-        console.log(formData)
-
-        // Send POST request to /login containing form data
-        const response = await fetch('/login', {
+        // Send POST request to /api/token containing form data
+        const response = await fetch('/api/token', {
             method: 'POST',
             body: formData
         });
+        const data = await response.json();
 
-        data = await response.json()
-
-        if (data.status != "success") {
+        if (data.response != 200) {
             document.getElementById('error').style.display = 'block';
         } else {
+            // Save the tokens in localStorage
+            window.localStorage.token = data.token;
+            window.localStorage.refreshToken = data.refreshToken;
             window.location.href = '/dashboard';
         }
     });
