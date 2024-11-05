@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from api.util.authentication import (
     authenticate_user,
     create_access_token,
-    get_current_user,
+    refresh_get_current_user,
 )
 from api.routes.links_route import router as links_router
 from api.util.db_dependency import get_db
@@ -75,10 +75,10 @@ async def login_for_access_token(
     )
     # Create a refresh token - just an access token with a longer expiry
     # and more restrictions ("refresh" is True)
-    refresh_token_expire = timedelta(days=1)
+    refresh_token_expires = timedelta(days=1)
     refresh_token = create_access_token(
         data={"sub": user.username, "refresh": True},
-        expire_delta=refresh_token_expire,
+        expires_delta=refresh_token_expires,
     )
     return Token(
         access_token=access_token,
@@ -91,8 +91,8 @@ async def login_for_access_token(
 # Part of that is token refresh, so we must implement it ourselves
 @app.post("/refresh")
 async def refresh_access_token(
-    current_user: Annotated[User, Depends(get_current_user, refresh=True)],
-):
+    current_user: Annotated[User, Depends(refresh_get_current_user)],
+) -> Token:
     """
     Return a new access token if the refresh token is valid
     """

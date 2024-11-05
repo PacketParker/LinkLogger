@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Optional
 import jwt
 
 from api.util.db_dependency import get_db
@@ -59,8 +59,23 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return encoded_jwt
 
 
-async def get_current_user(
+# Backwards kinda of way to get refresh token support
+# 'refresh_get_current_user' is only called from /refresh
+# and alerts 'current_user' that it should expect a refresh token
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    user = await current_user(token)
+    return user
+
+
+async def refresh_get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
+):
+    user = await current_user(token, is_refresh=True)
+    return user
+
+
+async def current_user(
+    token: str,
     is_refresh: bool = False,
     db=Depends(get_db),
 ):
