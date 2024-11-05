@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Path, Depends, Security, Request
+from fastapi import APIRouter, status, Path, Depends
 from fastapi.exception_handlers import HTTPException
 from typing import Annotated
 import string
@@ -6,11 +6,11 @@ import random
 import datetime
 import validators
 
-from api.util.db_dependency import get_db
+from app.util.db_dependency import get_db
 from models import Link, Record
-from api.schemas.links_schemas import URLSchema
-from api.schemas.auth_schemas import User
-from api.util.authentication import get_current_user
+from app.schemas.links_schemas import URLSchema
+from app.schemas.auth_schemas import User
+from app.util.authentication import get_current_user_from_token
 
 
 router = APIRouter(prefix="/links", tags=["links"])
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/links", tags=["links"])
 
 @router.get("/", summary="Get all of the links associated with your account")
 async def get_links(
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
     links = db.query(Link).filter(Link.owner == current_user.id).all()
@@ -32,7 +32,7 @@ async def get_links(
 @router.post("/", summary="Create a new link")
 async def create_link(
     url: URLSchema,
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
     # Check if the URL is valid
@@ -70,7 +70,7 @@ async def create_link(
 @router.delete("/{link}", summary="Delete a link")
 async def delete_link(
     link: Annotated[str, Path(title="Link to delete")],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
     link = link.upper()
@@ -103,7 +103,7 @@ async def delete_link(
 )
 async def get_link_records(
     link: Annotated[str, Path(title="Link to get records for")],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
     link = link.upper()
@@ -130,7 +130,7 @@ async def get_link_records(
 )
 async def delete_link_records(
     link: Annotated[str, Path(title="Link to delete records for")],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
     link = link.upper()

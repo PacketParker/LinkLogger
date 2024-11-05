@@ -1,14 +1,16 @@
 import random
 import bcrypt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import RedirectResponse
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta
 from typing import Annotated, Optional
 import jwt
 
-from api.util.db_dependency import get_db
-from api.schemas.auth_schemas import *
+from app.util.db_dependency import get_db
+from sqlalchemy.orm import sessionmaker
+from app.schemas.auth_schemas import *
 from models import User as UserDB
 
 secret_key = random.randbytes(32)
@@ -59,53 +61,82 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return encoded_jwt
 
 
-# Backwards kinda of way to get refresh token support
-# 'refresh_get_current_user' is only called from /refresh
-# and alerts 'current_user' that it should expect a refresh token
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    user = await current_user(token)
-    return user
-
-
-async def refresh_get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
+async def get_current_user_from_cookie(
+    access_token: str = Cookie(None), db=Depends(get_db)
 ):
-    user = await current_user(token, is_refresh=True)
-    return user
+    """
+    Return the user based on the access token in the cookie
+
+    Used for authentication into UI pages - so if no cookie
+    exists, redirect to login page rather than returning a 401
+
+    Also pass is_ui=True to alert get_current_user that we need
+    to use RedirectResponse rather than raising an HTTPException
+    """
+    if access_token:
+        return await get_current_user(access_token, is_ui=True, db=db)
+    return RedirectResponse(url="/login")
 
 
-async def current_user(
+async def get_current_user_from_token(
+    token: Annotated[str, Depends(oauth2_scheme)], db=Depends(get_db)
+):
+    return await get_current_user(token, db=db)
+
+
+# Backwards kinda of way to get refresh token support
+# `refresh_get_current_user` is only called from /refresh
+# and alerts `get_current_user` that it should expect a refresh token
+async def refresh_get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db=Depends(get_db)
+):
+    return await get_current_user(token, is_refresh=True, db=db)
+
+
+async def get_current_user(
     token: str,
     is_refresh: bool = False,
-    db=Depends(get_db),
+    is_ui: bool = False,
+    db: Optional[sessionmaker] = None,
 ):
     """
-    Return the current user based on the token, or raise a 401 error
+    Return the current user based on the token
+
+    OR on error -
+    If is_ui=True, the request is from a UI page and we should redirect to login
+    Otherwise, the request is from an API and we should return a 401
     """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+
+    def raise_unauthorized():
+        if is_ui:
+            return RedirectResponse(url="/login")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     try:
         payload = jwt.decode(token, secret_key, algorithms=[algorithm])
         username: str = payload.get("sub")
         refresh: bool = payload.get("refresh")
         if username is None:
-            raise credentials_exception
+            return raise_unauthorized()
         # For some reason, an access token was passed when a refresh
         # token was expected - some likely malicious activity
         if not refresh and is_refresh:
-            raise credentials_exception
+            return raise_unauthorized()
         # If the token passed is a refresh token and the function
         # is not expecting a refresh token, raise an error
         if refresh and not is_refresh:
-            raise credentials_exception
+            return raise_unauthorized()
 
         token_data = TokenData(username=username)
     except InvalidTokenError:
-        raise credentials_exception
+        return raise_unauthorized()
+
     user = get_user(db, username=token_data.username)
     if user is None:
-        raise credentials_exception
+        return raise_unauthorized()
+
     return user

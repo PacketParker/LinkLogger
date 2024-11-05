@@ -90,19 +90,15 @@
         event.preventDefault();
 
         const formData = new FormData(this);
-        // Send POST request to /api/token containing form data
-        const response = await fetch('/api/token', {
+        // Send POST request to /token containing form data
+        const response = await fetch('/token', {
             method: 'POST',
             body: formData
         });
-        const data = await response.json();
 
-        if (data.response != 200) {
+        if (response.status != 200) {
             document.getElementById('error').style.display = 'block';
         } else {
-            // Save the tokens in localStorage
-            window.localStorage.token = data.token;
-            window.localStorage.refreshToken = data.refreshToken;
             window.location.href = '/dashboard';
         }
     });
