@@ -26,7 +26,7 @@ async def login_for_access_token(
     Return an access token for the user, if the given authentication details are correct
     """
     user = authenticate_user(db, form_data.username, form_data.password)
-    print(user)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -35,14 +35,14 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=15)
     access_token = create_access_token(
-        data={"sub": user.id, "refresh": False},
+        data={"sub": user.id, "username": user.username, "refresh": False},
         expires_delta=access_token_expires,
     )
     # Create a refresh token - just an access token with a longer expiry
     # and more restrictions ("refresh" is True)
     refresh_token_expires = timedelta(days=1)
     refresh_token = create_access_token(
-        data={"sub": user.id, "refresh": True},
+        data={"sub": user.id, "username": user.username, "refresh": True},
         expires_delta=refresh_token_expires,
     )
     # response = JSONResponse(content={"success": True})

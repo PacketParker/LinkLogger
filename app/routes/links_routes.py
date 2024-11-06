@@ -7,7 +7,7 @@ import datetime
 import validators
 
 from app.util.db_dependency import get_db
-from models import Link, Record
+from models import Link, Log
 from app.schemas.links_schemas import URLSchema
 from app.schemas.auth_schemas import User
 from app.util.authentication import get_current_user_from_token
@@ -69,6 +69,9 @@ async def delete_link(
     current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
+    """
+    Delete a link and all of the logs associated with it
+    """
     link = link.upper()
     # Get the link and check the owner
     link = db.query(Link).filter(Link.link == link).first()
@@ -82,10 +85,10 @@ async def delete_link(
             detail="Link not associated with your account",
         )
 
-    # Get and delete all records associated with the link
-    records = db.query(Record).filter(Record.link == link.link).all()
-    for record in records:
-        db.delete(record)
+    # Get and delete all logsk
+    logs = db.query(Log).filter(Log.link == link.link).all()
+    for log in logs:
+        db.delete(log)
     # Delete the link
     db.delete(link)
     db.commit()
@@ -93,15 +96,15 @@ async def delete_link(
     return status.HTTP_204_NO_CONTENT
 
 
-@router.get(
-    "/{link}/records",
-    summary="Get all of the IP log records associated with a link",
-)
-async def get_link_records(
-    link: Annotated[str, Path(title="Link to get records for")],
+@router.get("/{link}/logs", summary="Get all logs associated with a link")
+async def get_link_logs(
+    link: Annotated[str, Path(title="Link to get logs for")],
     current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
+    """
+    Get all of the IP logs associated with a link
+    """
     link = link.upper()
     # Get the link and check the owner
     link = db.query(Link).filter(Link.link == link).first()
@@ -115,20 +118,20 @@ async def get_link_records(
             detail="Link not associated with your account",
         )
 
-    # Get and return all of the records associated with the link
-    records = db.query(Record).filter(Record.link == link.link).all()
-    return records
+    # Get and return all of the logs
+    logs = db.query(Log).filter(Log.link == link.link).all()
+    return logs
 
 
-@router.delete(
-    "/{link}/records",
-    summary="Delete all of the IP log records associated with a link",
-)
-async def delete_link_records(
-    link: Annotated[str, Path(title="Link to delete records for")],
+@router.delete("/{link}/logs", summary="Delete logs associated with a link")
+async def delete_link_logs(
+    link: Annotated[str, Path(title="Link to delete logs for")],
     current_user: Annotated[User, Depends(get_current_user_from_token)],
     db=Depends(get_db),
 ):
+    """
+    Delete all of the IP logs associated with a link
+    """
     link = link.upper()
     # Get the link and check the owner
     link = db.query(Link).filter(Link.link == link).first()
@@ -142,10 +145,10 @@ async def delete_link_records(
             detail="Link not associated with your account",
         )
 
-    # Get all of the records associated with the link and delete them
-    records = db.query(Record).filter(Record.link == link.link).all()
-    for record in records:
-        db.delete(record)
+    # Get all of the logs
+    logs = db.query(Log).filter(Log.link == link.link).all()
+    for log in logs:
+        db.delete(log)
     db.commit()
 
     return status.HTTP_204_NO_CONTENT

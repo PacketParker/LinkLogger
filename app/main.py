@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.routes.auth_routes import router as auth_router
 from app.routes.links_routes import router as links_router
@@ -151,3 +151,11 @@ async def redirect_to_docs():
 @app.exception_handler(HTTP_404_NOT_FOUND)
 async def custom_404_handler(request: Request, exc: HTTPException):
     return RedirectResponse(url="/login")
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": f"{exc.detail}"},
+    )

@@ -26,8 +26,8 @@ class Link(Base):
     expire_date = Column(DateTime, nullable=False)
 
 
-class Record(Base):
-    __tablename__ = "records"
+class Log(Base):
+    __tablename__ = "logs"
     id = Column(Integer, primary_key=True)
     owner = Column(Integer, ForeignKey("users.id"), nullable=False)
     link = Column(String, ForeignKey("links.link"), nullable=False)

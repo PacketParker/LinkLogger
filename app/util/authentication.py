@@ -28,11 +28,11 @@ def verify_password(plain_password, hashed_password):
     )
 
 
-def get_user(db, id: int):
+def get_user(db, username: str):
     """
     Get the user object from the database
     """
-    user = db.query(UserModel).filter(UserModel.id == id).first()
+    user = db.query(UserModel).filter(UserModel.username == username).first()
     if user:
         return UserInDB(**user.__dict__)
 
@@ -46,6 +46,7 @@ def authenticate_user(db, username: str, password: str):
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
+        print("WHY")
         return False
     return user
 
@@ -121,8 +122,9 @@ async def get_current_user(
     try:
         payload = jwt.decode(token, secret_key, algorithms=[algorithm])
         id: int = payload.get("sub")
+        username: str = payload.get("username")
         refresh: bool = payload.get("refresh")
-        if not id:
+        if not id or not username:
             return raise_unauthorized()
         # For some reason, an access token was passed when a refresh
         # token was expected - some likely malicious activity
@@ -136,7 +138,7 @@ async def get_current_user(
     except InvalidTokenError:
         return raise_unauthorized()
 
-    user = get_user(db, id)
+    user = get_user(db, username)
     if user is None:
         return raise_unauthorized()
 

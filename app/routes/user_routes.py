@@ -4,14 +4,16 @@ from typing import Annotated
 import string
 import bcrypt
 import random
-import datetime
-import validators
 
 from app.util.db_dependency import get_db
+from app.util.check_password_reqs import check_password_reqs
 from app.schemas.auth_schemas import User
 from app.schemas.user_schemas import *
 from models import User as UserModel
-from app.util.authentication import get_current_user_from_token
+from app.util.authentication import (
+    verify_password,
+    get_current_user_from_token,
+)
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -26,23 +28,27 @@ async def delete_user(
     """
     Delete the user account associated with the current user
     """
+    # No editing others accounts
     if user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only delete your own account",
         )
+
+    # Get the user and delete them
     user = db.query(UserModel).filter(UserModel.id == current_user.id).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+
     db.delete(user)
     db.commit()
     return status.HTTP_204_NO_CONTENT
 
 
-@router.post("/{user_id}", summary="Update your account password")
+@router.post("/{user_id}/password", summary="Update your account password")
 async def update_pass(
     user_id: Annotated[int, Path(title="Link to update")],
     update_data: UpdatePasswordSchema,
@@ -57,22 +63,19 @@ async def update_pass(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only update your own account",
         )
+
+    # Make sure that they entered the correct current password
+    if not verify_password(
+        update_data.current_password, current_user.hashed_password
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect current password",
+        )
+
     # Make sure the password meets all of the requirements
-    # if len(update_data.new_password) < 8:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="Password must be at least 8 characters",
-    #     )
-    # if not any(char.isdigit() for char in update_data.new_password):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="Password must contain at least one digit",
-    #     )
-    # if not any(char.isupper() for char in update_data.new_password):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="Password must contain at least one uppercase letter",
-    #     )
+    check_password_reqs(update_data.new_password)
+
     # Get the user and update the password
     user = db.query(UserModel).filter(UserModel.id == current_user.id).first()
     if not user:
@@ -98,24 +101,10 @@ async def get_links(
     """
     username = login_data.username
     password = login_data.password
-    print(username)
-    print(password)
+
     # Make sure the password meets all of the requirements
-    # if len(password) < 8:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="Password must be at least 8 characters",
-    #     )
-    # if not any(char.isdigit() for char in password):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="Password must contain at least one digit",
-    #     )
-    # if not any(char.isupper() for char in password):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="Password must contain at least one uppercase letter",
-    #     )
+    check_password_reqs(password)
+
     # Make sure the username isn't taken
     user = db.query(UserModel).filter(UserModel.username == username).first()
     if user:

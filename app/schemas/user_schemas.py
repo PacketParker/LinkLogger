@@ -7,5 +7,5 @@ class LoginDataSchema(BaseModel):
 
 
 class UpdatePasswordSchema(BaseModel):
-    password: str
+    current_password: str
     new_password: str

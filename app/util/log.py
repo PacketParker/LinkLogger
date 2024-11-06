@@ -4,10 +4,10 @@ from ua_parser import user_agent_parser
 
 from database import SessionLocal
 import config
-from models import Link, Record
+from models import Link, Log
 
 """
-Create a new log record whenever a link is visited
+Create a new log whenever a link is visited
 """
 
 
@@ -65,8 +65,8 @@ def log(link, ip, user_agent):
     browser = ua_string["user_agent"]["family"]
     os = f'{ua_string["os"]["family"]} {ua_string["os"]["major"]}'
 
-    # Create the log record and commit it to the database
-    link_record = Record(
+    # Create the log and commit it to the database
+    new_log = Log(
         owner=owner,
         link=link,
         timestamp=timestamp,
@@ -77,7 +77,7 @@ def log(link, ip, user_agent):
         user_agent=user_agent,
         isp=isp,
     )
-    db.add(link_record)
+    db.add(new_log)
     db.commit()
     db.close()
 
