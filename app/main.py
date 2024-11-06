@@ -5,11 +5,11 @@ from fastapi.templating import Jinja2Templates
 from app.routes.auth_routes import router as auth_router
 from app.routes.links_routes import router as links_router
 from app.routes.user_routes import router as user_router
-from typing import Annotated
+from typing import Annotated, Union
 from fastapi.exceptions import HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
 
-from app.util.authentication import get_current_user_from_cookie
+from app.util.authentication import get_current_user
 from app.util.db_dependency import get_db
 from app.util.log import log
 from app.schemas.auth_schemas import User
@@ -55,10 +55,8 @@ async def signup(request: Request):
 
 @app.get("/dashboard")
 async def dashboard(
-    response: Annotated[
-        User, RedirectResponse, Depends(get_current_user_from_cookie)
-    ],
     request: Request,
+    response: Union[User, RedirectResponse] = Depends(get_current_user),
 ):
     if isinstance(response, RedirectResponse):
         return response

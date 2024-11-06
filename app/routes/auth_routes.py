@@ -1,6 +1,6 @@
 from fastapi import Depends, APIRouter, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.responses import Response
+from fastapi.responses import Response, JSONResponse
 from datetime import timedelta
 from typing import Annotated
 
@@ -21,7 +21,7 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
     db=Depends(get_db),
-) -> Token:
+):
     """
     Return an access token for the user, if the given authentication details are correct
     """
@@ -45,20 +45,19 @@ async def login_for_access_token(
         data={"sub": user.id, "username": user.username, "refresh": True},
         expires_delta=refresh_token_expires,
     )
-    # response = JSONResponse(content={"success": True})
-    # response.set_cookie(
-    #     key="access_token", value=access_token, httponly=True, samesite="lax"
-    # )
-    # response.set_cookie(
-    #     key="refresh_token", value=refresh_token, httponly=True, samesite="lax"
-    # )
+    response = JSONResponse(content={"success": True})
+    response.set_cookie(key="access_token", value=access_token, httponly=True)
+    response.set_cookie(
+        key="refresh_token", value=refresh_token, httponly=True
+    )
+    return response
 
     # For Swagger UI to work, must return the token
-    return Token(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-    )
+    # return Token(
+    #     access_token=access_token,
+    #     refresh_token=refresh_token,
+    #     token_type="bearer",
+    # )
 
 
 # Full native JWT support is not complete in FastAPI yet :(

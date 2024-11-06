@@ -60,7 +60,6 @@ def log(link, ip, user_agent):
     # Get the location and ISP of the user
     location, isp = ip_to_location(ip)
 
-    timestamp = datetime.datetime.now()
     ua_string = user_agent_parser.Parse(user_agent)
     browser = ua_string["user_agent"]["family"]
     os = f'{ua_string["os"]["family"]} {ua_string["os"]["major"]}'
@@ -69,7 +68,6 @@ def log(link, ip, user_agent):
     new_log = Log(
         owner=owner,
         link=link,
-        timestamp=timestamp,
         ip=ip,
         location=location,
         browser=browser,

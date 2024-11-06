@@ -10,7 +10,7 @@ from app.util.db_dependency import get_db
 from models import Link, Log
 from app.schemas.links_schemas import URLSchema
 from app.schemas.auth_schemas import User
-from app.util.authentication import get_current_user_from_token
+from app.util.authentication import get_current_user
 
 
 router = APIRouter(prefix="/links", tags=["links"])
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/links", tags=["links"])
 
 @router.get("/", summary="Get all of the links associated with your account")
 async def get_links(
-    current_user: Annotated[User, Depends(get_current_user_from_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
     links = db.query(Link).filter(Link.owner == current_user.id).all()
@@ -32,7 +32,7 @@ async def get_links(
 @router.post("/", summary="Create a new link")
 async def create_link(
     url: URLSchema,
-    current_user: Annotated[User, Depends(get_current_user_from_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
     # Check if the URL is valid
@@ -51,8 +51,6 @@ async def create_link(
                 link=link_path,
                 owner=current_user.id,
                 redirect_link=url.url,
-                expire_date=datetime.datetime.now()
-                + datetime.timedelta(days=30),
             )
             db.add(new_link)
             db.commit()
@@ -60,13 +58,13 @@ async def create_link(
         except:
             continue
 
-    return new_link
+    return {"link": link_path, "expire_date": new_link.expire_date}
 
 
 @router.delete("/{link}", summary="Delete a link")
 async def delete_link(
     link: Annotated[str, Path(title="Link to delete")],
-    current_user: Annotated[User, Depends(get_current_user_from_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
     """
@@ -99,7 +97,7 @@ async def delete_link(
 @router.get("/{link}/logs", summary="Get all logs associated with a link")
 async def get_link_logs(
     link: Annotated[str, Path(title="Link to get logs for")],
-    current_user: Annotated[User, Depends(get_current_user_from_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
     """
@@ -118,15 +116,20 @@ async def get_link_logs(
             detail="Link not associated with your account",
         )
 
-    # Get and return all of the logs
-    logs = db.query(Log).filter(Log.link == link.link).all()
+    # Get and return all of the logs - ordered by timestamp
+    logs = (
+        db.query(Log)
+        .filter(Log.link == link.link)
+        .order_by(Log.timestamp.desc())
+        .all()
+    )
     return logs
 
 
 @router.delete("/{link}/logs", summary="Delete logs associated with a link")
 async def delete_link_logs(
     link: Annotated[str, Path(title="Link to delete logs for")],
-    current_user: Annotated[User, Depends(get_current_user_from_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
     """

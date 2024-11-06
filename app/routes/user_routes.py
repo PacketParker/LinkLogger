@@ -13,7 +13,7 @@ from app.schemas.user_schemas import *
 from models import User as UserModel
 from app.util.authentication import (
     verify_password,
-    get_current_user_from_token,
+    get_current_user,
 )
 
 
@@ -23,7 +23,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.delete("/{user_id}", summary="Delete your account")
 async def delete_user(
     user_id: Annotated[int, Path(title="Link to delete")],
-    current_user: Annotated[User, Depends(get_current_user_from_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
     """
@@ -53,7 +53,7 @@ async def delete_user(
 async def update_pass(
     user_id: Annotated[int, Path(title="Link to update")],
     update_data: UpdatePasswordSchema,
-    current_user: Annotated[User, Depends(get_current_user_from_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
     """

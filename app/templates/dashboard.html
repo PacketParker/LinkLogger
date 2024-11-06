@@ -7,9 +7,15 @@
 </head>
 <body>
     <div>
-        <!-- Create a small box that will hold the text for the users api key, next to the box should be a regenerate button -->
-        <p>Your Username: <span id="api-key">{{ user }}</span></p>
-        <button onclick="window.location.href='logout'">Logout</button>
+        <!-- Create a table with 5 columns with a total of 750px width -->
+        <table style="width: 750px; margin: 0 auto;">
+            <tr>
+                <th style="width: 150px;">ID</th>
+                <th style="width: 150px;">Timestamp</th>
+                <th style="width: 150px;">IP</th>
+                <th style="width: 150px;">Location</th>
+                <th style="width: 150px;">ISP</th>
+            </tr>
     </div>
 </body>
 </html>
@@ -31,17 +37,55 @@
         font-size: 25px;
         color: #ccc;
     }
-
-    button {
-        display: block;
-        margin: 10px auto;
-        width: 200px;
-        border-radius: 5px;
-        padding: 15px;
-        color: #ccc;
-        background-color: #415eac;
-        border: none;
-        font-size: 17px;
-        cursor: pointer;
-    }
 </style>
+
+<script>
+
+    // Function to get a cookie by name
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+
+    // On window load
+    window.onload = async () => {
+        const data = await fetch('/api/links/3MY70/logs', {
+            method: 'GET',
+        });
+
+        const logs = await data.json();
+
+        const table = document.querySelector('table');
+
+        // For every log, add a row to the table
+        counter = 1;
+        logs.forEach(log => {
+            const row = document.createElement('tr');
+
+            let date = new Date(log.timestamp);
+            let readableDate = date.toLocaleTimeString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }
+            );
+
+            row.innerHTML = `
+                <td>${counter++}</td>
+                <td>${readableDate}</td>
+                <td>${log.ip}</td>
+                <td>${log.location}</td>
+                <td>${log.isp}</td>
+            `;
+
+            table.appendChild(row);
+        });
+    }
+</script>
