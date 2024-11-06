@@ -96,8 +96,6 @@
             body: formData
         });
 
-        console.log(await response.json());
-
         if (response.status != 200) {
             document.getElementById('error').style.display = 'block';
         } else {

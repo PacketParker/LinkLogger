@@ -86,7 +86,7 @@ async def get_current_user_from_token(
     return await get_current_user(token, db=db)
 
 
-# Backwards kinda of way to get refresh token support
+# Backwards kind of way to get refresh token support
 # `refresh_get_current_user` is only called from /refresh
 # and alerts `get_current_user` that it should expect a refresh token
 async def refresh_get_current_user(

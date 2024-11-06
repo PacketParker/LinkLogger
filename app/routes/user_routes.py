@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, Path, Depends
 from fastapi.exception_handlers import HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 import string
 import bcrypt
@@ -92,15 +93,15 @@ async def update_pass(
 
 @router.post("/register", summary="Register a new user")
 async def get_links(
-    login_data: LoginDataSchema,
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db=Depends(get_db),
 ):
     """
     Given the login data (username, password) process the registration of a new
     user account and return either the user or an error message
     """
-    username = login_data.username
-    password = login_data.password
+    username = form_data.username
+    password = form_data.password
 
     # Make sure the password meets all of the requirements
     check_password_reqs(password)

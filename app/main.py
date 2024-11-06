@@ -49,56 +49,6 @@ async def signup(request: Request):
     return templates.TemplateResponse("signup.html", {"request": request})
 
 
-# TODO: Create users routes
-# User - register/create
-# User - delete
-# User - update
-
-# @app.route("/signup", methods=["GET", "POST"])
-# def signup():
-#     if request.method == "POST":
-#         username = request.form["username"]
-#         password = request.form["password"]
-
-#         # Verify the password meets requirements
-#         if len(password) < 8:
-#             return {"status": "Password must be at least 8 characters"}
-#         if not any(char.isdigit() for char in password):
-#             return {"status": "Password must contain at least one digit"}
-#         if not any(char.isupper() for char in password):
-#             return {
-#                 "status": "Password must contain at least one uppercase letter"
-#             }
-
-#         # Get database session
-#         db = SessionLocal()
-
-#         user = db.query(User).filter(User.username == username).first()
-#         if user:
-#             db.close()
-#             return {"status": "Username not available"}
-#         # Add information to the database
-#         hashed_password = bcrypt.hashpw(
-#             password.encode("utf-8"), bcrypt.gensalt()
-#         ).decode("utf-8")
-#         api_key = "".join(
-#             random.choices(string.ascii_letters + string.digits, k=20)
-#         )
-#         new_user = User(
-#             username=username, password=hashed_password, api_key=api_key
-#         )
-#         db.add(new_user)
-#         db.commit()
-#         db.close()
-#         # Log in the newly created user
-#         flask_user = FlaskUser()
-#         flask_user.id = username
-#         login_user(flask_user)
-
-#         return {"status": "success"}
-#     return render_template("signup.html")
-
-
 @app.get("/dashboard")
 async def dashboard(
     response: Annotated[

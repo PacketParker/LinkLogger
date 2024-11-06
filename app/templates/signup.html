@@ -91,24 +91,21 @@
         // Prevent default form submission
         event.preventDefault();
 
-        // Get form data
         const formData = new FormData(this);
-
-        console.log(formData)
-
         // Send POST request to /signup containing form data
-        const response = await fetch('/signup', {
+        const response = await fetch('/api/users/register', {
             method: 'POST',
             body: formData
         });
 
-        data = await response.json()
+        if (response.status != 200) {
+            const data = await response.json();
 
-        if (data.status != "success") {
             document.getElementById('error').style.display = 'block';
-            document.getElementById('error').innerText = data.status;
-        } else {
-            window.location.href = '/dashboard';
+            document.getElementById('error').innerText = data.detail;
+        }
+        else {
+            window.location.href = '/login';
         }
     });
 </script>
