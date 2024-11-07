@@ -7,15 +7,44 @@
 </head>
 <body>
     <div>
-        <!-- Create a table with 5 columns with a total of 750px width -->
-        <table style="width: 750px; margin: 0 auto;">
+        <!-- Create a table with 4 columns with a total of 1000px width -->
+        <table style="width: 1000px; margin: 0 auto;">
             <tr>
-                <th style="width: 150px;">ID</th>
-                <th style="width: 150px;">Timestamp</th>
-                <th style="width: 150px;">IP</th>
-                <th style="width: 150px;">Location</th>
-                <th style="width: 150px;">ISP</th>
+                <th style="width: 250px;">Link</th>
+                <th style="width: 250px;">Visits</th>
+                <th style="width: 250px;">Redirect</th>
+                <th style="width: 250px;">Expire Date</th>
             </tr>
+
+            <!-- Create a table row for each link -->
+            <!-- <tr>
+                <td>(Link)</td>
+                <td>(Visits)</td>
+                <td>(Redirect)</td>
+                <td>(Expire Date)</td>
+                <td class="log-table-row"> -->
+                    <!-- Create a sub table that will be opened when the link is clicked -->
+                    <!-- <table style="width: 750px; margin: 0 auto;">
+                        <tr>
+                            <th style="width: 150px;">ID</th>
+                            <th style="width: 150px;">Timestamp</th>
+                            <th style="width: 150px;">IP</th>
+                            <th style="width: 150px;">Location</th>
+                            <th style="width: 150px;">ISP</th>
+                        </tr> -->
+
+                        <!-- Create a table row for each log -->
+                        <!-- <tr>
+                            <td>(ID)</td>
+                            <td>(Timestamp)</td>
+                            <td>(IP)</td>
+                            <td>(Location)</td>
+                            <td>(ISP)</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr> -->
+        </table>
     </div>
 </body>
 </html>
@@ -37,55 +66,181 @@
         font-size: 25px;
         color: #ccc;
     }
+
+    table {
+        border-collapse: collapse;
+        background-color: #333;
+        color: #ccc;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    th {
+        background-color: #444;
+    }
+
+    tr:nth-child(even) {
+        background-color: #444;
+    }
+
+    tr:nth-child(odd) {
+        background-color: #333;
+    }
+
+    .log-table-row {
+        display: none;
+    }
+
+    .log-table-row td {
+        padding: 0;
+    }
+
+    .log-table-row table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .log-table-row th, .log-table-row td {
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .log-table-row th {
+        background-color: #444;
+    }
+
+    .log-table-row tr:nth-child(even) {
+        background-color: #444;
+    }
+
+    .log-table-row tr:nth-child(odd) {
+        background-color: #333;
+    }
+
+
 </style>
 
 <script>
+    async function fetchLinks() {
+        const response = await fetch('/api/links');
+        if (!response.ok) {
+            throw new Error('Failed to fetch links');
+        }
+        const links = await response.json();
+        return links;
+    }
 
-    // Function to get a cookie by name
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
+    async function fetchLogs(link) {
+        const response = await fetch(`/api/links/${link}/logs`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch logs');
+        }
+        const logs = await response.json();
+        return logs;
     }
 
 
-    // On window load
-    window.onload = async () => {
-        const data = await fetch('/api/links/3MY70/logs', {
-            method: 'GET',
-        });
-
-        const logs = await data.json();
-
-        const table = document.querySelector('table');
-
-        // For every log, add a row to the table
-        counter = 1;
-        logs.forEach(log => {
-            const row = document.createElement('tr');
-
-            let date = new Date(log.timestamp);
-            let readableDate = date.toLocaleTimeString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }
-            );
-
-            row.innerHTML = `
-                <td>${counter++}</td>
-                <td>${readableDate}</td>
-                <td>${log.ip}</td>
-                <td>${log.location}</td>
-                <td>${log.isp}</td>
+    function createRow(index, link, logs) {
+        // Create the sub-table with the logs
+        let subTable = `
+            <table style="width: 750px; margin: 0 auto; id=${index}">
+                <tr>
+                    <th style="width: 150px;">ID</th>
+                    <th style="width: 150px;">Timestamp</th>
+                    <th style="width: 150px;">IP</th>
+                    <th style="width: 150px;">Location</th>
+                    <th style="width: 150px;">ISP</th>
+                </tr>
+        `;
+        // Loop through the logs and create a row for each one
+        logs.forEach((log, index) => {
+            let row = `
+                <tr>
+                    <td>${logs.length - index}</td>
+                    <td>${log.timestamp}</td>
+                    <td>${log.ip}</td>
+                    <td>${log.location}</td>
+                    <td>${log.isp}</td>
+                </tr>
             `;
+            subTable += row;
+        });
+        subTable += '</table>';
 
-            table.appendChild(row);
+        // Convert the link expire timestamp to a readable date
+        let date = new Date(link.expire_date);
+        let expireDate = date.toLocaleTimeString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+
+        // Create the HTML for the row with sub-table
+        let row = `
+            <tr>
+                <td>
+                    <button class="link-button" id="${index}">${link.link}</button>    
+                </td>
+                <td>${logs.length}</td>
+                <td>${link.redirect_link}</td>
+                <td>${expireDate}</td>
+            </tr>
+            <tr class="log-table-row" id="${index}-log">
+                <td colspan="4">
+                    ${subTable}
+                </td>
+            </tr>
+        `;
+        return row;
+    }
+
+
+
+    async function getData() {
+        let links = fetchLinks();
+        links = await links;
+
+        console.log(links);
+        // Links is an Array of objects with the link data
+        // Loop through the links and create a row for each one
+        links.forEach(async (link, index) => {
+            // Fetch the logs for the link
+            let logs = await fetchLogs(link.link);
+            logs = await logs;
+            // Create the entire row with sub-table and logs
+            let row = createRow(index, link, logs);
+            // Add the new table row to the main table
+            document.querySelector('table').innerHTML += row;
         });
     }
+
+    function hideLogTables() {
+        let tables = document.querySelectorAll('table tr table');
+        tables.forEach(table => {
+            table.style.display = 'none';
+        });
+    }
+
+    getData();
+    hideLogTables();
+
+    // Add event listener to each element with the class of link-button
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('link-button')) {
+            let id = event.target.id;
+            let table = document.getElementById(`${id}-log`);
+            if (table.style.display === 'none') {
+                table.style.display = 'table-row';
+            } else {
+                table.style.display = 'none';
+            }
+        }
+    });
 </script>
