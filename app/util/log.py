@@ -68,6 +68,7 @@ def log(link, ip, user_agent):
     new_log = Log(
         owner=owner,
         link=link,
+        timestamp=datetime.datetime.utcnow(),
         ip=ip,
         location=location,
         browser=browser,

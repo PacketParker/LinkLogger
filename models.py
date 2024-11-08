@@ -24,10 +24,7 @@ class Link(Base):
     link = Column(String, primary_key=True)
     owner = Column(Integer, ForeignKey("users.id"), nullable=False)
     redirect_link = Column(String, nullable=False)
-    expire_date = Column(
-        DateTime,
-        default=datetime.datetime.utcnow() + datetime.timedelta(days=30),
-    )
+    expire_date = Column(DateTime, nullable=False)
 
 
 class Log(Base):
@@ -35,7 +32,7 @@ class Log(Base):
     id = Column(Integer, primary_key=True)
     owner = Column(Integer, ForeignKey("users.id"), nullable=False)
     link = Column(String, ForeignKey("links.link"), nullable=False)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow())
+    timestamp = Column(DateTime, nullable=False)
     ip = Column(String, nullable=False)
     location = Column(String, nullable=False)
     browser = Column(String, nullable=False)
