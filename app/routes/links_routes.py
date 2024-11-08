@@ -21,7 +21,13 @@ async def get_links(
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
-    links = db.query(Link).filter(Link.owner == current_user.id).all()
+    # Get and sort links by expiration date descending
+    links = (
+        db.query(Link)
+        .filter(Link.owner == current_user.id)
+        .order_by(Link.expire_date.desc())
+        .all()
+    )
     if not links:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No links found"
