@@ -58,6 +58,7 @@ async def login_for_access_token(
 @router.post("/refresh")
 async def refresh_access_token(
     current_user: Annotated[User, Depends(refresh_get_current_user)],
+    response: Response,
 ) -> Token:
     """
     Return a new access token if the refresh token is valid
@@ -67,7 +68,6 @@ async def refresh_access_token(
         data={"sub": current_user.id, "refresh": False},
         expires_delta=access_token_expires,
     )
-    return Token(
-        access_token=access_token,
-        token_type="bearer",
-    )
+    response = JSONResponse(content={"success": True})
+    response.set_cookie(key="access_token", value=access_token, httponly=True)
+    return response
