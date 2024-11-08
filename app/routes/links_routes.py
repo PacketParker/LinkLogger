@@ -61,7 +61,7 @@ async def create_link(
     return {"link": link_path, "expire_date": new_link.expire_date}
 
 
-@router.delete("/{link}", summary="Delete a link")
+@router.delete("/{link}", summary="Delete a link and all associated logs")
 async def delete_link(
     link: Annotated[str, Path(title="Link to delete")],
     current_user: Annotated[User, Depends(get_current_user)],
@@ -126,9 +126,13 @@ async def get_link_logs(
     return logs
 
 
-@router.delete("/{link}/logs", summary="Delete logs associated with a link")
-async def delete_link_logs(
-    link: Annotated[str, Path(title="Link to delete logs for")],
+@router.delete(
+    "/{link}/logs/{log_id}",
+    summary="Delete a specific log associated with a link",
+)
+async def delete_single_log(
+    link: Annotated[str, Path(title="Link associated with the log to delete")],
+    log_id: Annotated[int, Path(title="Log ID to delete")],
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
@@ -148,10 +152,13 @@ async def delete_link_logs(
             detail="Link not associated with your account",
         )
 
-    # Get all of the logs
-    logs = db.query(Log).filter(Log.link == link.link).all()
-    for log in logs:
-        db.delete(log)
+    # Get the log and delete it
+    log = db.query(Log).filter(Log.id == log_id).first()
+    if not log:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Log not found"
+        )
+    db.delete(log)
     db.commit()
 
     return status.HTTP_204_NO_CONTENT

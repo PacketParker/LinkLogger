@@ -4,46 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkLogger | Dashboard</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div>
         <!-- Create a table with 4 columns with a total of 1000px width -->
-        <table style="width: 1000px; margin: 0 auto;">
+        <table>
             <tr>
-                <th style="width: 250px;">Link</th>
-                <th style="width: 250px;">Visits</th>
-                <th style="width: 250px;">Redirect</th>
-                <th style="width: 250px;">Expire Date</th>
+                <th>Link</th>
+                <th>Visits</th>
+                <th>Redirect</th>
+                <th>Expire Date</th>
             </tr>
-
-            <!-- Create a table row for each link -->
-            <!-- <tr>
-                <td>(Link)</td>
-                <td>(Visits)</td>
-                <td>(Redirect)</td>
-                <td>(Expire Date)</td>
-                <td class="log-table-row"> -->
-                    <!-- Create a sub table that will be opened when the link is clicked -->
-                    <!-- <table style="width: 750px; margin: 0 auto;">
-                        <tr>
-                            <th style="width: 150px;">ID</th>
-                            <th style="width: 150px;">Timestamp</th>
-                            <th style="width: 150px;">IP</th>
-                            <th style="width: 150px;">Location</th>
-                            <th style="width: 150px;">ISP</th>
-                        </tr> -->
-
-                        <!-- Create a table row for each log -->
-                        <!-- <tr>
-                            <td>(ID)</td>
-                            <td>(Timestamp)</td>
-                            <td>(IP)</td>
-                            <td>(Location)</td>
-                            <td>(ISP)</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr> -->
         </table>
     </div>
 </body>
@@ -58,68 +31,62 @@
     }
 
     div {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        font-size: 25px;
-        color: #ccc;
+        display: flex;
+        justify-content: center;
+        margin-top: 100px;
     }
 
     table {
-        border-collapse: collapse;
-        background-color: #333;
+        margin: 20px 0 20px 0;
+        text-align: center;
+        font-size: 25px;
+        width: 1250px;
         color: #ccc;
-    }
-
-    th, td {
-        border: 1px solid #ccc;
-        padding: 10px;
-    }
-
-    th {
-        background-color: #444;
-    }
-
-    tr:nth-child(even) {
-        background-color: #444;
-    }
-
-    tr:nth-child(odd) {
-        background-color: #333;
-    }
-
-    .log-table-row {
-        display: none;
-    }
-
-    .log-table-row td {
-        padding: 0;
-    }
-
-    .log-table-row table {
-        width: 100%;
         border-collapse: collapse;
+        overflow: hidden;
     }
 
-    .log-table-row th, .log-table-row td {
-        border: 1px solid #ccc;
+    table th {
+        background-color: #415eac;
+        padding: 10px;
+        border: 2px solid #ccc;
+    }
+
+    .link-table-row {
+        border: 2px solid #ccc;
+    }
+
+    table td {
         padding: 10px;
     }
 
-    .log-table-row th {
-        background-color: #444;
+    .link-table-row td {
+        padding: 20px;
     }
 
-    .log-table-row tr:nth-child(even) {
-        background-color: #444;
+    .log-table-row table td {
+        background-color: #3b4148;
+        padding: 10px;
     }
 
-    .log-table-row tr:nth-child(odd) {
-        background-color: #333;
+    .log-table-row table tr {
+        border: 2px solid #ccc;
     }
 
+    .link-button {
+        background-color: #3b4148;
+        color: #ccc;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 25px;
+        border-radius: 5px;
+    }
+
+    .fa-trash:hover {
+        color: rgb(238, 86, 86);
+        cursor: pointer;
+    }
 
 </style>
 
@@ -146,24 +113,25 @@
     function createRow(index, link, logs) {
         // Create the sub-table with the logs
         let subTable = `
-            <table style="width: 750px; margin: 0 auto; id=${index}">
+            <table>
                 <tr>
-                    <th style="width: 150px;">ID</th>
-                    <th style="width: 150px;">Timestamp</th>
-                    <th style="width: 150px;">IP</th>
-                    <th style="width: 150px;">Location</th>
-                    <th style="width: 150px;">ISP</th>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>IP</th>
+                    <th>Location</th>
+                    <th colspan="2">ISP</th>
                 </tr>
         `;
         // Loop through the logs and create a row for each one
         logs.forEach((log, index) => {
             let row = `
-                <tr>
+                <tr id="${log.id}-log">
                     <td>${logs.length - index}</td>
                     <td>${log.timestamp}</td>
                     <td>${log.ip}</td>
                     <td>${log.location}</td>
                     <td>${log.isp}</td>
+                    <td><i class="fa-solid fa-trash" id="${log.id}/${link.link}""></i></td>
                 </tr>
             `;
             subTable += row;
@@ -184,16 +152,16 @@
 
         // Create the HTML for the row with sub-table
         let row = `
-            <tr>
+            <tr class="link-table-row">
                 <td>
-                    <button class="link-button" id="${index}">${link.link}</button>    
+                    <button class="link-button" id="${index}">${link.link}</button>
                 </td>
                 <td>${logs.length}</td>
                 <td>${link.redirect_link}</td>
                 <td>${expireDate}</td>
             </tr>
-            <tr class="log-table-row" id="${index}-log">
-                <td colspan="4">
+            <tr class="log-table-row" id="${index}-logTR" style="display: none;">
+                <td colspan="6">
                     ${subTable}
                 </td>
             </tr>
@@ -221,26 +189,41 @@
         });
     }
 
-    function hideLogTables() {
-        let tables = document.querySelectorAll('table tr table');
-        tables.forEach(table => {
-            table.style.display = 'none';
+    // hideLogRows to all log-table-rows
+    function hideLogRows() {
+        let logTRs = document.querySelectorAll('.log-table-row');
+        logTRs.forEach(row => {
+            row.style.display = 'none';
         });
     }
 
-    getData();
-    hideLogTables();
-
-    // Add event listener to each element with the class of link-button
+    // Add event listener to all link buttons
     document.addEventListener('click', (event) => {
         if (event.target.classList.contains('link-button')) {
             let id = event.target.id;
-            let table = document.getElementById(`${id}-log`);
-            if (table.style.display === 'none') {
-                table.style.display = 'table-row';
+            let logTR = document.getElementById(`${id}-logTR`);
+            if (logTR.style.display === 'none') {
+                hideLogRows();
+                logTR.style.display = 'table-row';
             } else {
-                table.style.display = 'none';
+                logTR.style.display = 'none';
             }
         }
     });
+
+    // Add an event listen to all trash bins
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('fa-trash')) {
+            let id = event.target.id;
+            let link = id.split('/')[1];
+            let logId = id.split('/')[0];
+            fetch(`/api/links/${link}/logs/${logId}`, {
+                method: 'DELETE'
+            });
+            let logRow = document.getElementById(`${logId}-log`)
+            logRow.remove();
+        }
+    });
+
+    getData();
 </script>
