@@ -137,7 +137,7 @@ async def delete_single_log(
     db=Depends(get_db),
 ):
     """
-    Delete all of the IP logs associated with a link
+    Delete the specified log associated with a link
     """
     link = link.upper()
     # Get the link and check the owner
