@@ -16,7 +16,7 @@ from app.util.authentication import get_current_user
 router = APIRouter(prefix="/links", tags=["links"])
 
 
-@router.get("/", summary="Get all of the links associated with your account")
+@router.get("", summary="Get all of the links associated with your account")
 async def get_links(
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
@@ -35,7 +35,7 @@ async def get_links(
     return links
 
 
-@router.post("/", summary="Create a new link")
+@router.post("", summary="Create a new link")
 async def create_link(
     url: URLSchema,
     current_user: Annotated[User, Depends(get_current_user)],

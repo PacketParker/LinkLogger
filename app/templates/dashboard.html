@@ -6,12 +6,13 @@
     <title>LinkLogger | Dashboard</title>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="/static/js/jwt.js"></script>
 </head>
 <body>
     <div>
         <!-- Create a table with 4 columns with a total of 1000px width -->
         <table>
-            <tr>
+            <tr style="border: 2px solid #ccc;">
                 <th>Link</th>
                 <th>Visits</th>
                 <th>Redirect</th>
@@ -36,20 +37,30 @@
         margin-top: 100px;
     }
 
+
     table {
         margin: 20px 0 20px 0;
         text-align: center;
         font-size: 25px;
-        width: 1250px;
+        width: 1000px;
         color: #ccc;
         border-collapse: collapse;
         overflow: hidden;
     }
 
+    /* Center all sub tables */
+    .log-table-row table {
+        margin: 0 auto;
+    }
+
+    .log-table-row table {
+        width: 90%;
+    }
+
     table th {
         background-color: #415eac;
-        padding: 10px;
         border: 2px solid #ccc;
+        padding: 10px;
     }
 
     .link-table-row {
@@ -91,25 +102,6 @@
 </style>
 
 <script>
-    async function fetchLinks() {
-        const response = await fetch('/api/links');
-        if (!response.ok) {
-            throw new Error('Failed to fetch links');
-        }
-        const links = await response.json();
-        return links;
-    }
-
-    async function fetchLogs(link) {
-        const response = await fetch(`/api/links/${link}/logs`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch logs');
-        }
-        const logs = await response.json();
-        return logs;
-    }
-
-
     function createRow(index, link, logs) {
         // Create the sub-table with the logs
         let subTable = `
@@ -124,10 +116,20 @@
         `;
         // Loop through the logs and create a row for each one
         logs.forEach((log, index) => {
+            let logTimestamp = new Date(log.timestamp).toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(',', '');
+
             let row = `
                 <tr id="${log.id}-log">
                     <td>${logs.length - index}</td>
-                    <td>${log.timestamp}</td>
+                    <td>${logTimestamp}</td>
                     <td>${log.ip}</td>
                     <td>${log.location}</td>
                     <td>${log.isp}</td>
@@ -172,21 +174,23 @@
 
 
     async function getData() {
-        let links = fetchLinks();
-        links = await links;
-
-        console.log(links);
+        const links = await accessAPI(`/links`, 'GET')
+        if (!links) {
+            throw new Error('Failed to fetch links');
+        }
         // Links is an Array of objects with the link data
         // Loop through the links and create a row for each one
-        links.forEach(async (link, index) => {
-            // Fetch the logs for the link
-            let logs = await fetchLogs(link.link);
-            logs = await logs;
-            // Create the entire row with sub-table and logs
-            let row = createRow(index, link, logs);
-            // Add the new table row to the main table
+        // Do not use async because then the order or data in the
+        // table will change from time to time
+        for (let i = 0; i < links.length; i++) {
+            let link = links[i];
+            let logs = await accessAPI(`/links/${link.link}/logs`, 'GET')
+            if (!logs) {
+                throw new Error('Failed to fetch logs');
+            }
+            let row = createRow(i, link, logs);
             document.querySelector('table').innerHTML += row;
-        });
+        }
     }
 
     // hideLogRows to all log-table-rows
@@ -203,6 +207,7 @@
             let id = event.target.id;
             let logTR = document.getElementById(`${id}-logTR`);
             if (logTR.style.display === 'none') {
+                // Hide any open log tables
                 hideLogRows();
                 logTR.style.display = 'table-row';
             } else {
@@ -214,14 +219,18 @@
     // Add an event listen to all trash bins
     document.addEventListener('click', (event) => {
         if (event.target.classList.contains('fa-trash')) {
-            let id = event.target.id;
-            let link = id.split('/')[1];
-            let logId = id.split('/')[0];
-            fetch(`/api/links/${link}/logs/${logId}`, {
-                method: 'DELETE'
-            });
-            let logRow = document.getElementById(`${logId}-log`)
-            logRow.remove();
+            // Confirm the user wants to delete the log
+            let confirmDelete = confirm('Are you sure you want to delete this log?');
+            if (confirmDelete) {
+                let id = event.target.id;
+                let link = id.split('/')[1];
+                let logId = id.split('/')[0];
+                fetch(`/api/links/${link}/logs/${logId}`, {
+                    method: 'DELETE'
+                });
+                let logRow = document.getElementById(`${logId}-log`)
+                logRow.remove();
+            }
         }
     });
 

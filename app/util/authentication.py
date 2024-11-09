@@ -72,6 +72,10 @@ async def refresh_get_current_user(
     return await get_current_user(token, is_refresh=True, db=db)
 
 
+def process_refresh_token(token: str, db: Session):
+    return False
+
+
 async def get_current_user(
     request: Request,
     db=Depends(get_db),
@@ -84,21 +88,22 @@ async def get_current_user(
     Otherwise, the request is from an API and we should return a 401
     """
 
-    # If the request is from /api/auth/refresh, it is a request to get
-    # a new access token using a refresh token
-    if request.url.path == "/api/auth/refresh":
-        token = request.cookies.get("refresh_token")
-        is_refresh = True
-    else:
-        token = request.cookies.get("access_token")
-        is_refresh = False
-
     def raise_unauthorized():
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # If the request is from /api/auth/refresh, it is a request to get
+    # a new access token using a refresh token
+    if request.url.path == "/api/auth/refresh":
+        token = request.cookies.get("refresh_token")
+        user = process_refresh_token(token, db)
+        if user is None:
+            raise_unauthorized()
+    else:
+        token = request.cookies.get("access_token")
 
     try:
         payload = jwt.decode(token, secret_key, algorithms=[algorithm])

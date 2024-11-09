@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, Request, Path
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from app.routes.auth_routes import router as auth_router
 from app.routes.links_routes import router as links_router
 from app.routes.user_routes import router as user_router
@@ -35,6 +36,7 @@ app.add_middleware(
     allow_credentials=True,
 )
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 # Import routes
