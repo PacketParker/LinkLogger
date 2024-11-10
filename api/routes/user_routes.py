@@ -6,12 +6,12 @@ import string
 import bcrypt
 import random
 
-from app.util.db_dependency import get_db
-from app.util.check_password_reqs import check_password_reqs
-from app.schemas.auth_schemas import User
-from app.schemas.user_schemas import *
+from api.util.db_dependency import get_db
+from api.util.check_password_reqs import check_password_reqs
+from api.schemas.auth_schemas import User
+from api.schemas.user_schemas import *
 from models import User as UserModel
-from app.util.authentication import (
+from api.util.authentication import (
     verify_password,
     get_current_user,
 )

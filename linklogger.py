@@ -1,7 +1,7 @@
 import uvicorn
 
 import config
-from app.main import app
+from api.main import app
 from database import Base, engine
 
 

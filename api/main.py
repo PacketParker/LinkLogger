@@ -1,19 +1,15 @@
 from fastapi import FastAPI, Depends, Request, Path
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from app.routes.auth_routes import router as auth_router
-from app.routes.links_routes import router as links_router
-from app.routes.user_routes import router as user_router
-from typing import Annotated, Union
+from fastapi.responses import JSONResponse, RedirectResponse
+from api.routes.auth_routes import router as auth_router
+from api.routes.links_routes import router as links_router
+from api.routes.user_routes import router as user_router
+from typing import Annotated
 from fastapi.exceptions import HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
 
-from app.util.authentication import get_current_user
-from app.util.db_dependency import get_db
-from app.util.log import log
-from app.schemas.auth_schemas import User
+from api.util.db_dependency import get_db
+from api.util.log import log
 from models import Link
 
 
@@ -28,43 +24,26 @@ app = FastAPI(
     },
 )
 
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "localhost:3000",
+    "127.0.0.1:3000",
+    # f"{CUSTOM_DOMAIN}"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True,
 )
-
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
 
 # Import routes
 app.include_router(auth_router, prefix="/api")
 app.include_router(links_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
-
-
-@app.get("/login")
-async def login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-
-@app.get("/signup")
-async def signup(request: Request):
-    return templates.TemplateResponse("signup.html", {"request": request})
-
-
-@app.get("/dashboard")
-async def dashboard(
-    request: Request,
-    response: Union[User, RedirectResponse] = Depends(get_current_user),
-):
-    if isinstance(response, RedirectResponse):
-        return response
-    return templates.TemplateResponse(
-        "dashboard.html", {"request": request, "user": response.username}
-    )
 
 
 @app.get("/c/{link}")

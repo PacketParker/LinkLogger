@@ -6,11 +6,11 @@ import random
 import datetime
 import validators
 
-from app.util.db_dependency import get_db
+from api.util.db_dependency import get_db
 from models import Link, Log
-from app.schemas.links_schemas import URLSchema
-from app.schemas.auth_schemas import User
-from app.util.authentication import get_current_user
+from api.schemas.links_schemas import URLSchema
+from api.schemas.auth_schemas import User
+from api.util.authentication import get_current_user
 
 
 router = APIRouter(prefix="/links", tags=["links"])

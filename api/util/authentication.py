@@ -2,15 +2,14 @@ import random
 import bcrypt
 from fastapi import Depends, HTTPException, status, Request, Cookie
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.responses import RedirectResponse
-from jwt.exceptions import InvalidTokenError
+from fastapi.responses import Response
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 from datetime import datetime, timedelta
-from typing import Annotated, Optional
 import jwt
 
-from app.util.db_dependency import get_db
+from api.util.db_dependency import get_db
 from sqlalchemy.orm import Session
-from app.schemas.auth_schemas import *
+from api.schemas.auth_schemas import *
 from models import User as UserModel
 
 secret_key = random.randbytes(32)
@@ -62,18 +61,12 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return encoded_jwt
 
 
-# Backwards kind of way to get refresh token support
-# `refresh_get_current_user` is only called from /refresh
-# and alerts `get_current_user` that it should expect a refresh token
-async def refresh_get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    db=Depends(get_db),
-):
-    return await get_current_user(token, is_refresh=True, db=db)
-
-
-def process_refresh_token(token: str, db: Session):
-    return False
+def raise_unauthorized():
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 async def get_current_user(
@@ -81,40 +74,17 @@ async def get_current_user(
     db=Depends(get_db),
 ):
     """
-    Return the current user based on the token
+    Return the current user object if the access token is valid
 
-    OR on error -
-    If is_ui=True, the request is from a UI page and we should redirect to login
-    Otherwise, the request is from an API and we should return a 401
+    All failed attempts will return a 401
     """
-
-    def raise_unauthorized():
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # If the request is from /api/auth/refresh, it is a request to get
-    # a new access token using a refresh token
-    if request.url.path == "/api/auth/refresh":
-        token = request.cookies.get("refresh_token")
-        user = process_refresh_token(token, db)
-        if user is None:
-            raise_unauthorized()
-    else:
-        token = request.cookies.get("access_token")
+    token = request.cookies.get("access_token")
 
     try:
         payload = jwt.decode(token, secret_key, algorithms=[algorithm])
         id: int = payload.get("sub")
         username: str = payload.get("username")
-        refresh: bool = payload.get("refresh")
         if not id or not username:
-            return raise_unauthorized()
-
-        # Make sure that a refresh token was not passed to any other endpoint
-        if refresh and not is_refresh:
             return raise_unauthorized()
 
     except InvalidTokenError:
