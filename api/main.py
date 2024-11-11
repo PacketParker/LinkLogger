@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from api.routes.auth_routes import router as auth_router
 from api.routes.links_routes import router as links_router
 from api.routes.user_routes import router as user_router
+from api.routes.log_routes import router as log_router
 from typing import Annotated
 from fastapi.exceptions import HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
@@ -44,6 +45,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/api")
 app.include_router(links_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
+app.include_router(log_router, prefix="/api")
 
 
 @app.get("/c/{link}")

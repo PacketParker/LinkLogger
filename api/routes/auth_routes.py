@@ -7,8 +7,10 @@ from typing import Annotated
 from api.util.authentication import (
     create_access_token,
     authenticate_user,
+    get_current_user,
 )
 from api.util.db_dependency import get_db
+from api.schemas.auth_schemas import User
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -44,3 +46,14 @@ async def login_for_access_token(
         # secure=True,  # Cookies are only sent over HTTPS
     )
     return response
+
+
+# Check if the user is logged in
+@router.get("/check", summary="Check if the user is logged in")
+async def check_login(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """
+    If the user actually makes it to this endpoint, they are logged in
+    """
+    return {"success": True}

@@ -5,15 +5,15 @@ body {
     background-color: #2c3338;
 }
 
-#container {
-    display: flex;
-    justify-content: center;
-    margin-top: 100px;
+#mainTable {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-
 table {
-    margin: 20px 0 20px 0;
+    margin: 0 auto;
     text-align: center;
     font-size: 25px;
     width: 1000px;
@@ -23,11 +23,11 @@ table {
 }
 
 /* Center all sub tables */
-.log-table-row table {
+.logTableRow table {
     margin: 0 auto;
 }
 
-.log-table-row table {
+.logTableRow table {
     width: 90%;
 }
 
@@ -37,7 +37,7 @@ table th {
     padding: 10px;
 }
 
-.link-table-row {
+.linkTableRow {
     border: 2px solid #ccc;
 }
 
@@ -45,20 +45,20 @@ table td {
     padding: 10px;
 }
 
-.link-table-row td {
+.linkTableRow td {
     padding: 20px;
 }
 
-.log-table-row table td {
+.logTableRow table td {
     background-color: #3b4148;
     padding: 10px;
 }
 
-.log-table-row table tr {
+.logTableRow table tr {
     border: 2px solid #ccc;
 }
 
-.link-button {
+.linkButton {
     background-color: #3b4148;
     color: #ccc;
     border: none;
@@ -68,7 +68,12 @@ table td {
     border-radius: 5px;
 }
 
-.fa-trash:hover {
+.trashBin:hover {
     color: rgb(238, 86, 86);
     cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.trashBin:active {
+    transform: scale(0.95);
 }

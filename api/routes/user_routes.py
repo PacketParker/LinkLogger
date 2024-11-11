@@ -22,7 +22,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.delete("/{user_id}", summary="Delete your account")
 async def delete_user(
-    user_id: Annotated[int, Path(title="Link to delete")],
+    user_id: Annotated[int, Path(title="ID of user to delete")],
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
@@ -51,7 +51,7 @@ async def delete_user(
 
 @router.post("/{user_id}/password", summary="Update your account password")
 async def update_pass(
-    user_id: Annotated[int, Path(title="Link to update")],
+    user_id: Annotated[int, Path(title="ID of user to update")],
     update_data: UpdatePasswordSchema,
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
