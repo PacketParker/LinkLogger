@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Axios from 'axios';
+import axios from 'axios';
 import styles from '../styles/Dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -34,7 +34,8 @@ function Dashboard() {
 
   // Fetch links from API
   useEffect(() => {
-    Axios.get('/api/links')
+    axios
+      .get('/api/links')
       .then((res) => {
         if (res.status === 200) {
           setLinks(res.data);
@@ -42,6 +43,9 @@ function Dashboard() {
           navigate('/login');
         }
       })
+
+      // Catch 404 error = user has no links
+
       .catch(() => {
         navigate('/login');
       });
@@ -49,7 +53,8 @@ function Dashboard() {
 
   // Fetch logs from API
   useEffect(() => {
-    Axios.get('/api/logs')
+    axios
+      .get('/api/logs')
       .then((res) => {
         if (res.status === 200) {
           setLogs(res.data);
@@ -57,13 +62,50 @@ function Dashboard() {
           navigate('/login');
         }
       })
+
+      // Catch 404 error = user has no logs
+
       .catch(() => {
         navigate('/login');
       });
   }, []);
 
+  /**
+   * Display or hide logs for a specific link
+   * @param link The link to toggle logs for
+   */
   const toggleLogRow = (link: string) => {
     setVisibleLog(visibleLog === link ? null : link);
+  };
+
+  /**
+   * Delete a specific log
+   * Gets the log ID from the SVG element's ID attribute
+   * @param e The event object from the click
+   * @returns void - updates state (setLogs) if successful
+   */
+  const deleteLog = (e: React.MouseEvent<SVGSVGElement>) => {
+    const confirmDelete = confirm('Are you sure you want to delete this log?');
+    if (!confirmDelete) return;
+
+    const id = parseInt(e.currentTarget.id);
+    axios
+      .delete(`/api/logs/${id}`)
+      .then((res) => {
+        if (res.status === 200) {
+          setLogs(logs.filter((log) => log.id !== id));
+        }
+      })
+      .catch((error: unknown) => {
+        if (axios.isAxiosError(error)) {
+          // Return to login if we are unauthorized for some reason
+          if (error.response?.status === 401) {
+            navigate('/login');
+          } else {
+            alert('Failed to delete log. Please try again.');
+          }
+        }
+      });
   };
 
   return (
@@ -125,6 +167,8 @@ function Dashboard() {
                               <FontAwesomeIcon
                                 icon={faTrash}
                                 className={styles.trashBin}
+                                id={log.id.toString()}
+                                onClick={deleteLog}
                               />
                             </td>
                           </tr>
