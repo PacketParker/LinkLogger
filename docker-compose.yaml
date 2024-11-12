@@ -2,7 +2,8 @@ services:
     linklogger:
         container_name: linklogger
         image: ghcr.io/packetparker/linklogger:latest
-        network_mode: host
         volumes:
             - /path/on/system:/data
-        restart: on-failure
+        ports:
+            - 5100:5000
+        restart: always

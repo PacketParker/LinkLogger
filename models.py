@@ -6,7 +6,6 @@ from sqlalchemy import (
     Text,
     DateTime,
 )
-import datetime
 
 from database import Base
 

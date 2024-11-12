@@ -58,9 +58,9 @@ def load_config():
         with open(file_path, "w") as f:
             f.write(
                 """
-            ip_to_location: ""
-            api_key: ""
-            """
+config:
+    ip_to_location:
+    api_key:"""
             )
         LOG.critical(
             "`config.yaml` was not found, a template has been created."

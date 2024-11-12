@@ -67,20 +67,10 @@ async def log_redirect(
         return RedirectResponse(url=link_record.redirect_link)
 
 
-# Redirect /api -> /api/docs
-@app.get("/api")
-async def redirect_to_docs():
-    return RedirectResponse(url="/docs")
-
-
 # Custom handler for 404 errors
 @app.exception_handler(HTTP_404_NOT_FOUND)
 async def custom_404_handler(request: Request, exc: HTTPException):
-    # If the request is from /api, return a JSON response
-    if request.url.path.startswith("/api"):
-        return JSONResponse(
-            status_code=404,
-            content={"message": "Resource not found"},
-        )
-    # Otherwise, redirect to the login page
-    return RedirectResponse(url="/login")
+    return JSONResponse(
+        status_code=404,
+        content={"message": "Resource not found"},
+    )
