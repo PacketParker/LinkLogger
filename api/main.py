@@ -1,13 +1,11 @@
 from fastapi import FastAPI, Depends, Request, Path
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from api.routes.auth_routes import router as auth_router
 from api.routes.links_routes import router as links_router
 from api.routes.user_routes import router as user_router
 from api.routes.log_routes import router as log_router
 from typing import Annotated
-from fastapi.exceptions import HTTPException
-from starlette.status import HTTP_404_NOT_FOUND
 
 from api.util.db_dependency import get_db
 from api.util.log import log
@@ -65,12 +63,3 @@ async def log_redirect(
         log(link, ip, user_agent)
         db.close()
         return RedirectResponse(url=link_record.redirect_link)
-
-
-# Custom handler for 404 errors
-@app.exception_handler(HTTP_404_NOT_FOUND)
-async def custom_404_handler(request: Request, exc: HTTPException):
-    return JSONResponse(
-        status_code=404,
-        content={"message": "Resource not found"},
-    )
