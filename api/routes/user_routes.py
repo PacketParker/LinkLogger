@@ -20,6 +20,16 @@ from api.util.authentication import (
 router = APIRouter(prefix="/users", tags=["users"])
 
 
+@router.get("/me", summary="Get your username")
+async def get_username(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """
+    Get the username of the current user
+    """
+    return {"username": current_user.username}
+
+
 @router.delete("/{user_id}", summary="Delete your account")
 async def delete_user(
     user_id: Annotated[int, Path(title="ID of user to delete")],
