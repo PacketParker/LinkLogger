@@ -3,6 +3,7 @@ import styles from '../styles/Login.module.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from './Navbar';
 
 function Signup() {
   document.title = 'LinkLogger | Signup';
@@ -61,52 +62,55 @@ function Signup() {
   };
 
   return (
-    <div id={styles.container}>
-      <p id={styles.signupText}>Sign up</p>
-      <p id={styles.error} className={error ? 'visible' : 'hidden'}>
-        {error}
-      </p>
-      <div>
-        <header>
-          <hr></hr>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="password"
-              value={password}
-              minLength={8}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="confirm password"
-              value={passwordConfirm}
-              minLength={8}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              required
-            />
-            <button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit'}
-            </button>
-          </form>
-          <hr></hr>
-          <p id={styles.bottomText}>
-            Already have an account?{' '}
-            <Link to="/login" className={styles.link}>
-              Log in here.
-            </Link>
-          </p>
-        </header>
+    <>
+      <Navbar />
+      <div id={styles.container}>
+        <p id={styles.signupText}>Sign up</p>
+        <p id={styles.error} className={error ? 'visible' : 'hidden'}>
+          {error}
+        </p>
+        <div>
+          <header>
+            <hr></hr>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="password"
+                value={password}
+                minLength={8}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="confirm password"
+                value={passwordConfirm}
+                minLength={8}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+                required
+              />
+              <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Submit'}
+              </button>
+            </form>
+            <hr></hr>
+            <p id={styles.bottomText}>
+              Already have an account?{' '}
+              <Link to="/login" className={styles.link}>
+                Log in here.
+              </Link>
+            </p>
+          </header>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

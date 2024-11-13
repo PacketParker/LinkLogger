@@ -1,18 +1,41 @@
-/* Create the nav and center the span */
+/* Create the navbar and set the colors */
 .navbar {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  background-color: #f8f9fa;
+  justify-content: space-between;
+  background-color: #3b4148;
+  color: white;
+  padding: 15px;
 }
 
-/* Create the nav links */
+.navbarLink {
+  margin: 0 20px;
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: #ccc;
+  font-size: 20px;
+  font-weight: 600;
+}
 
-span {
-    font-size: 35px;
-    font-weight: 600;
-    color: #333;
-    text-decoration: none;
-    margin-right: 10px;
+.navbarLink::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #ccc;
+  transition: width 0.3s ease;
+}
+
+.navbarLink:hover::after {
+  width: 100%;
+}
+
+.navbarLeft {
+  margin-left: 50px;
+}
+
+.navbarRight {
+  margin-right: 50px;
 }
