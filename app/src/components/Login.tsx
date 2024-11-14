@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import styles from '../styles/Login.module.css';
+import styles from '../styles/Auth.module.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -51,42 +51,36 @@ function Login() {
   return (
     <>
       <Navbar />
-      <div id={styles.container}>
-        <p id={styles.loginText}>Log In</p>
-        <p id={styles.error} className={error ? 'visible' : 'hidden'}>
-          {error}
+      <div className={styles.container}>
+        <h1>Log In</h1>
+        <h2 className={error ? 'errorVisible' : 'errorHidden'}>{error}</h2>
+        <hr></hr>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+        </form>
+        <hr></hr>
+        <p className={styles.footnote}>
+          Don't have an account?{' '}
+          <Link to="/signup" className={styles.footnoteLink}>
+            Create one now
+          </Link>
         </p>
-        <div>
-          <header>
-            <hr></hr>
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                placeholder="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Submit'}
-              </button>
-            </form>
-            <hr></hr>
-            <p id={styles.bottomText}>
-              Don't have an account?{' '}
-              <Link to="/signup" className={styles.link}>
-                Create one now
-              </Link>
-            </p>
-          </header>
-        </div>
       </div>
     </>
   );

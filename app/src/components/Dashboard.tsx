@@ -47,10 +47,7 @@ function Dashboard() {
 
       .catch((error: unknown) => {
         if (axios.isAxiosError(error)) {
-          if (error.response?.status === 404) {
-            // Create a message alerting the user there are no links
-            navigate('/login');
-          } else {
+          if (error.response?.status != 404) {
             navigate('/login');
           }
         }
@@ -68,11 +65,12 @@ function Dashboard() {
           navigate('/login');
         }
       })
-
-      // Catch 404 error = user has no logs
-
-      .catch(() => {
-        navigate('/login');
+      .catch((error: unknown) => {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status != 404) {
+            navigate('/login');
+          }
+        }
       });
   }, []);
 
@@ -117,7 +115,7 @@ function Dashboard() {
   return (
     <>
       <Navbar />
-      <table id={styles.mainTable}>
+      <table className={styles.mainTable}>
         <thead>
           <tr style={{ border: '2px solid #ccc' }}>
             <th>Link</th>
@@ -127,6 +125,17 @@ function Dashboard() {
           </tr>
         </thead>
         <tbody>
+          {/* If there are no links, put a special message */}
+          {links.length === 0 && (
+            <tr>
+              <td colSpan={4}>
+                <div className={styles.noLinks}>
+                  You do not have any shortened links - try creating one.
+                </div>
+              </td>
+            </tr>
+          )}
+
           {/* For every link and its logs */}
           {links.map((link) => (
             <React.Fragment key={link.link}>
@@ -161,7 +170,7 @@ function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {/* Render logs only if visibleLog matches the link */}
+                        {/* Render all logs for the link */}
                         {logs
                           .filter((log) => log.link === link.link)
                           .map((log, index, filteredLogs) => (
@@ -181,6 +190,17 @@ function Dashboard() {
                               </td>
                             </tr>
                           ))}
+                        {/* If the link has no logs, put a special message */}
+                        {logs.filter((log) => log.link === link.link).length ===
+                          0 && (
+                          <tr>
+                            <td colSpan={6}>
+                              <div className={styles.noLogs}>
+                                No logs for this link
+                              </div>
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </td>

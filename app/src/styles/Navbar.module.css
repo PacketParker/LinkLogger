@@ -1,4 +1,3 @@
-/* Create the navbar and set the colors */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -7,7 +6,7 @@
   padding: 15px;
 }
 
-.navbarLink {
+.link {
   margin: 0 20px;
   position: relative;
   display: inline-block;
@@ -17,7 +16,7 @@
   font-weight: 600;
 }
 
-.navbarLink::after {
+.link::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -28,14 +27,22 @@
   transition: width 0.3s ease;
 }
 
-.navbarLink:hover::after {
+.link:hover::after {
   width: 100%;
 }
 
-.navbarLeft {
+.circleUp {
+  color: rgb(122, 224, 122);
+}
+
+.circleDown {
+  color: rgb(218, 112, 112);
+}
+
+.left {
   margin-left: 50px;
 }
 
-.navbarRight {
+.right {
   margin-right: 50px;
 }

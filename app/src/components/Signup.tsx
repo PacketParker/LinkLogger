@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import styles from '../styles/Login.module.css';
+import styles from '../styles/Auth.module.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -64,51 +64,45 @@ function Signup() {
   return (
     <>
       <Navbar />
-      <div id={styles.container}>
-        <p id={styles.signupText}>Sign up</p>
-        <p id={styles.error} className={error ? 'visible' : 'hidden'}>
-          {error}
+      <div className={styles.container}>
+        <h1>Sign up</h1>
+        <h2 className={error ? 'errorVisible' : 'errorHidden'}>{error}</h2>
+        <hr></hr>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="password"
+            value={password}
+            minLength={8}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="confirm password"
+            value={passwordConfirm}
+            minLength={8}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
+            required
+          />
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+        </form>
+        <hr></hr>
+        <p className={styles.footnote}>
+          Already have an account?{' '}
+          <Link to="/login" className={styles.footnoteLink}>
+            Log in here.
+          </Link>
         </p>
-        <div>
-          <header>
-            <hr></hr>
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                placeholder="password"
-                value={password}
-                minLength={8}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                placeholder="confirm password"
-                value={passwordConfirm}
-                minLength={8}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-                required
-              />
-              <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Submit'}
-              </button>
-            </form>
-            <hr></hr>
-            <p id={styles.bottomText}>
-              Already have an account?{' '}
-              <Link to="/login" className={styles.link}>
-                Log in here.
-              </Link>
-            </p>
-          </header>
-        </div>
       </div>
     </>
   );
