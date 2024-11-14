@@ -63,3 +63,8 @@ async def log_redirect(
         log(link, ip, user_agent)
         db.close()
         return RedirectResponse(url=link_record.redirect_link)
+
+
+@app.get("/api/ping")
+async def ping():
+    return {"ping": "pong"}
