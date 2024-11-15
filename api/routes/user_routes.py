@@ -11,6 +11,8 @@ from api.util.check_password_reqs import check_password_reqs
 from api.schemas.auth_schemas import User
 from api.schemas.user_schemas import *
 from models import User as UserModel
+from models import Link as LinkModel
+from models import Log as LogModel
 from api.util.authentication import (
     verify_password,
     get_current_user,
@@ -53,6 +55,16 @@ async def delete_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+
+    # Delete all links and logs associated with the user
+    links = (
+        db.query(LinkModel).filter(LinkModel.owner == current_user.id).all()
+    )
+    for link in links:
+        db.delete(link)
+        logs = db.query(LogModel).filter(LogModel.link == link.link).all()
+        for log in logs:
+            db.delete(log)
 
     db.delete(user)
     db.commit()
