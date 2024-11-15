@@ -56,7 +56,7 @@ table td {
 
 .mainTable {
     position: absolute;
-    top: 100px;
+    top: 150px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -101,4 +101,14 @@ table td {
 
 .trashBin:active {
     transform: scale(0.95);
+}
+
+.noLinksLink {
+    color: #ccc;
+    text-decoration: underline;
+}
+
+.noLinksLink:hover {
+    color: #415eac;
+    text-decoration: none;
 }

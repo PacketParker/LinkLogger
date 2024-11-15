@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from '../styles/Dashboard.module.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Navbar from './Navbar';
@@ -149,7 +149,11 @@ function Dashboard() {
               <tr>
                 <td colSpan={4}>
                   <div className={styles.noLinks}>
-                    You do not have any shortened links - try creating one.
+                    You do not have any shortened links -{' '}
+                    <Link to="/create" className={styles.noLinksLink}>
+                      create one here
+                    </Link>
+                    .
                   </div>
                 </td>
               </tr>
