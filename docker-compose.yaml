@@ -5,5 +5,5 @@ services:
         volumes:
             - /path/on/system:/data
         ports:
-            - 5100:5000
-        restart: always
+            - 6464:6464
+        restart: unless-stopped
