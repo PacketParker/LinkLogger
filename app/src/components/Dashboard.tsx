@@ -31,6 +31,8 @@ function Dashboard() {
   const [links, setLinks] = useState<Link[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [visibleLog, setVisibleLog] = useState<string | null>(null);
+  const [loadingLinks, setLoadingLinks] = useState<boolean>(true); // Track loading state for links
+  const [loadingLogs, setLoadingLogs] = useState<boolean>(true); // Track loading state for logs
   const navigate = useNavigate();
 
   // Fetch links from API
@@ -44,13 +46,15 @@ function Dashboard() {
           navigate('/login');
         }
       })
-
       .catch((error: unknown) => {
         if (axios.isAxiosError(error)) {
-          if (error.response?.status != 404) {
+          if (error.response?.status !== 404) {
             navigate('/login');
           }
         }
+      })
+      .finally(() => {
+        setLoadingLinks(false); // Set loadingLinks to false once done
       });
   }, []);
 
@@ -67,10 +71,13 @@ function Dashboard() {
       })
       .catch((error: unknown) => {
         if (axios.isAxiosError(error)) {
-          if (error.response?.status != 404) {
+          if (error.response?.status !== 404) {
             navigate('/login');
           }
         }
+      })
+      .finally(() => {
+        setLoadingLogs(false); // Set loadingLogs to false once done
       });
   }, []);
 
@@ -112,104 +119,117 @@ function Dashboard() {
       });
   };
 
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className={styles.loadingSpinner}>
+      <div className={styles.spinner}></div>
+      <p>Loading...</p>
+    </div>
+  );
+
   return (
     <>
       <Navbar />
-      <table className={styles.mainTable}>
-        <thead>
-          <tr style={{ border: '2px solid #ccc' }}>
-            <th>Link</th>
-            <th>Visits</th>
-            <th>Redirect</th>
-            <th>Expire Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* If there are no links, put a special message */}
-          {links.length === 0 && (
-            <tr>
-              <td colSpan={4}>
-                <div className={styles.noLinks}>
-                  You do not have any shortened links - try creating one.
-                </div>
-              </td>
+      {/* Show loading spinner if either links or logs are still loading */}
+      {loadingLinks || loadingLogs ? (
+        <LoadingSpinner />
+      ) : (
+        <table className={styles.mainTable}>
+          <thead>
+            <tr style={{ border: '2px solid #ccc' }}>
+              <th>Link</th>
+              <th>Visits</th>
+              <th>Redirect</th>
+              <th>Expire Date</th>
             </tr>
-          )}
-
-          {/* For every link and its logs */}
-          {links.map((link) => (
-            <React.Fragment key={link.link}>
-              <tr className={styles.linkTableRow}>
-                <td>
-                  <button
-                    onClick={() => toggleLogRow(link.link)}
-                    className={styles.linkButton}
-                  >
-                    {link.link}
-                  </button>
+          </thead>
+          <tbody>
+            {/* If there are no links, put a special message */}
+            {links.length === 0 && (
+              <tr>
+                <td colSpan={4}>
+                  <div className={styles.noLinks}>
+                    You do not have any shortened links - try creating one.
+                  </div>
                 </td>
-                <td>
-                  {logs.filter((log) => log.link === link.link).length || 0}
-                </td>
-                <td>{link.redirect_link}</td>
-                <td>{link.expire_date}</td>
               </tr>
+            )}
 
-              {/* Conditionally render logs for this link */}
-              {visibleLog === link.link && (
-                <tr className={styles.logTableRow}>
-                  <td colSpan={6}>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Timestamp</th>
-                          <th>IP</th>
-                          <th>Location</th>
-                          <th colSpan={2}>ISP</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {/* Render all logs for the link */}
-                        {logs
-                          .filter((log) => log.link === link.link)
-                          .map((log, index, filteredLogs) => (
-                            <tr key={log.id}>
-                              <td>{filteredLogs.length - index}</td>
-                              <td>{log.timestamp}</td>
-                              <td>{log.ip}</td>
-                              <td>{log.location}</td>
-                              <td>{log.isp}</td>
-                              <td>
-                                <FontAwesomeIcon
-                                  icon={faTrash}
-                                  className={styles.trashBin}
-                                  id={log.id.toString()}
-                                  onClick={deleteLog}
-                                />
+            {/* For every link and its logs */}
+            {links.map((link) => (
+              <React.Fragment key={link.link}>
+                <tr className={styles.linkTableRow}>
+                  <td>
+                    <button
+                      onClick={() => toggleLogRow(link.link)}
+                      className={styles.linkButton}
+                    >
+                      {link.link}
+                    </button>
+                  </td>
+                  <td>
+                    {logs.filter((log) => log.link === link.link).length || 0}
+                  </td>
+                  <td>{link.redirect_link}</td>
+                  <td>{link.expire_date}</td>
+                </tr>
+
+                {/* Conditionally render logs for this link */}
+                {visibleLog === link.link && (
+                  <tr className={styles.logTableRow}>
+                    <td colSpan={6}>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>IP</th>
+                            <th>Location</th>
+                            <th colSpan={2}>ISP</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {/* Render all logs for the link */}
+                          {logs
+                            .filter((log) => log.link === link.link)
+                            .map((log, index, filteredLogs) => (
+                              <tr key={log.id}>
+                                <td>{filteredLogs.length - index}</td>
+                                <td>{log.timestamp}</td>
+                                <td>{log.ip}</td>
+                                <td>{log.location}</td>
+                                <td>{log.isp}</td>
+                                <td>
+                                  <FontAwesomeIcon
+                                    icon={faTrash}
+                                    className={styles.trashBin}
+                                    id={log.id.toString()}
+                                    onClick={deleteLog}
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          {/* If the link has no logs, put a special message */}
+                          {logs.filter((log) => log.link === link.link)
+                            .length === 0 && (
+                            <tr>
+                              <td colSpan={6}>
+                                <div className={styles.noLogs}>
+                                  No logs for this link
+                                </div>
                               </td>
                             </tr>
-                          ))}
-                        {/* If the link has no logs, put a special message */}
-                        {logs.filter((log) => log.link === link.link).length ===
-                          0 && (
-                          <tr>
-                            <td colSpan={6}>
-                              <div className={styles.noLogs}>
-                                No logs for this link
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              )}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                          )}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      )}
     </>
   );
 }

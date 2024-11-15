@@ -23,7 +23,7 @@ function Navbar() {
     };
 
     checkAPIStatus();
-  });
+  }, []);
 
   return (
     <div className={styles.navbar}>

@@ -1,0 +1,11 @@
+.createInput {
+  display: block;
+  margin: 10px auto;
+  width: 500px;
+  border-radius: 5px;
+  padding: 15px;
+  color: #ccc;
+  background-color: #3b4148;
+  border: none;
+  font-size: 17px;
+}

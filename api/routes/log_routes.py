@@ -21,9 +21,44 @@ async def get_logs(
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
+    """
+    Get all of the logs associated with the current user
+    """
     logs = (
         db.query(Log)
         .filter(Log.owner == current_user.id)
+        .order_by(Log.timestamp.desc())
+        .all()
+    )
+    if not logs:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No logs found"
+        )
+    return logs
+
+
+@router.get("/{link}", summary="Get all logs for a specific link")
+async def get_logs_for_link(
+    link: Annotated[str, Path(title="Link to get logs for")],
+    current_user: Annotated[User, Depends(get_current_user)],
+    db=Depends(get_db),
+):
+    """
+    Get all of the logs associated with a specific link
+        - check to make sure the requester is the owner
+    """
+    link = (
+        db.query(Link)
+        .filter(Link.owner == current_user.id, Link.short == link)
+        .first()
+    )
+    if not link:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
+        )
+    logs = (
+        db.query(Log)
+        .filter(Log.link_id == link.id)
         .order_by(Log.timestamp.desc())
         .all()
     )
@@ -40,6 +75,9 @@ async def get_log(
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
+    """
+    Get a specific log (given the log ID)
+    """
     log = (
         db.query(Log)
         .filter(Log.id == log_id, Log.owner == current_user.id)
@@ -58,6 +96,9 @@ async def delete_log(
     current_user: Annotated[User, Depends(get_current_user)],
     db=Depends(get_db),
 ):
+    """
+    Delete a specific log (given the log ID)
+    """
     log = (
         db.query(Log)
         .filter(Log.id == log_id, Log.owner == current_user.id)

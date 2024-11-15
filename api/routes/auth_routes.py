@@ -33,7 +33,7 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=1)
+    access_token_expires = timedelta(minutes=180)
     access_token = create_access_token(
         data={"sub": user.id, "username": user.username},
         expires_delta=access_token_expires,

@@ -53,10 +53,13 @@ function Login() {
       <Navbar />
       <div className={styles.container}>
         <h1>Log In</h1>
-        <h2 className={error ? 'errorVisible' : 'errorHidden'}>{error}</h2>
+        <p className={error ? styles.errorVisible : styles.errorHidden}>
+          {error}
+        </p>
         <hr></hr>
         <form onSubmit={handleSubmit}>
           <input
+            className={styles.authInput}
             type="text"
             placeholder="username"
             value={username}
@@ -64,6 +67,7 @@ function Login() {
             required
           />
           <input
+            className={styles.authInput}
             type="password"
             placeholder="password"
             value={password}

@@ -16,7 +16,6 @@ body {
 
 h1 {
   color: #ccc;
-  font-size: 30px;
   font-weight: 600;
   border: 2px solid #606468;
   padding: 10px;
@@ -24,16 +23,16 @@ h1 {
   margin: 0 auto;
 }
 
-input {
+.authInput {
   display: block;
   margin: 10px auto;
   width: 300px;
   border-radius: 5px;
   padding: 15px;
+  font-size: 17px;
   color: #ccc;
   background-color: #3b4148;
   border: none;
-  font-size: 17px;
 }
 
 button {
@@ -42,10 +41,10 @@ button {
   width: 100%;
   border-radius: 5px;
   padding: 15px;
+  font-size: 17px;
   color: #ccc;
   background-color: #415eac;
   border: none;
-  font-size: 17px;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.3s ease;
 }
@@ -61,6 +60,7 @@ button:active {
 .errorVisible {
   visibility: visible;
   color: #ee6161;
+  font-weight: 600;
 }
 
 .errorHidden {

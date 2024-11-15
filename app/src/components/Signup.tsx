@@ -66,10 +66,13 @@ function Signup() {
       <Navbar />
       <div className={styles.container}>
         <h1>Sign up</h1>
-        <h2 className={error ? 'errorVisible' : 'errorHidden'}>{error}</h2>
+        <h2 className={error ? styles.errorVisible : styles.errorHidden}>
+          {error}
+        </h2>
         <hr></hr>
         <form onSubmit={handleSubmit}>
           <input
+            className={styles.authInput}
             type="text"
             placeholder="username"
             value={username}
@@ -77,6 +80,7 @@ function Signup() {
             required
           />
           <input
+            className={styles.authInput}
             type="password"
             placeholder="password"
             value={password}
@@ -85,6 +89,7 @@ function Signup() {
             required
           />
           <input
+            className={styles.authInput}
             type="password"
             placeholder="confirm password"
             value={passwordConfirm}
