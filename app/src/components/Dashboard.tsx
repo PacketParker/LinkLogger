@@ -175,7 +175,7 @@ function Dashboard() {
                     {logs.filter((log) => log.link === link.link).length || 0}
                   </td>
                   <td>{link.redirect_link}</td>
-                  <td>{link.expire_date}</td>
+                  <td>{new Date(link.expire_date).toLocaleDateString()}</td>
                 </tr>
 
                 {/* Conditionally render logs for this link */}
@@ -199,7 +199,15 @@ function Dashboard() {
                             .map((log, index, filteredLogs) => (
                               <tr key={log.id}>
                                 <td>{filteredLogs.length - index}</td>
-                                <td>{log.timestamp}</td>
+                                <td>
+                                  {new Date(
+                                    log.timestamp
+                                  ).toLocaleTimeString() +
+                                    ', ' +
+                                    new Date(
+                                      log.timestamp
+                                    ).toLocaleDateString()}
+                                </td>
                                 <td>{log.ip}</td>
                                 <td>{log.location}</td>
                                 <td>{log.isp}</td>

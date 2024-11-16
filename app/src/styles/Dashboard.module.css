@@ -87,6 +87,7 @@ table td {
 .logTableRow table td {
     background-color: #3b4148;
     padding: 10px;
+    font-size: 17px;
 }
 
 .logTableRow table tr {
