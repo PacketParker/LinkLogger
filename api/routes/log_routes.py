@@ -47,9 +47,10 @@ async def get_logs_for_link(
     Get all of the logs associated with a specific link
         - check to make sure the requester is the owner
     """
+    link = link.upper()
     link = (
         db.query(Link)
-        .filter(Link.owner == current_user.id, Link.short == link)
+        .filter(Link.owner == current_user.id, Link.link == link)
         .first()
     )
     if not link:
@@ -58,7 +59,7 @@ async def get_logs_for_link(
         )
     logs = (
         db.query(Log)
-        .filter(Log.link_id == link.id)
+        .filter(Log.link == link.link)
         .order_by(Log.timestamp.desc())
         .all()
     )
