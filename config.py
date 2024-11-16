@@ -23,6 +23,12 @@ LOG.addHandler(stream)
 
 IP_TO_LOCATION = None
 API_KEY = None
+DB_NAME = None
+DB_ENGINE = None
+DB_HOST = None
+DB_PORT = None
+DB_USER = None
+DB_PASSWORD = None
 
 schema = {
     "type": "object",
@@ -34,7 +40,26 @@ schema = {
                 "api_key": {"type": "string"},
             },
             "required": ["ip_to_location"],
-        }
+        },
+        "database": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "default": "linklogger"},
+                "engine": {"type": "string"},
+                "host": {"type": "string"},
+                "port": {"type": "integer"},
+                "user": {"type": "string"},
+                "password": {"type": "string"},
+            },
+            "required": [
+                "name",
+                "engine",
+                "host",
+                "port",
+                "user",
+                "password",
+            ],
+        },
     },
     "required": ["config"],
 }
@@ -50,16 +75,26 @@ def load_config():
     try:
         with open(file_path, "r") as f:
             file_contents = f.read()
-            validate_config(file_contents)
+            if not validate_config(file_contents):
+                return False
+            else:
+                return True
 
     except FileNotFoundError:
         # Create new config.yaml w/ template
         with open(file_path, "w") as f:
             f.write(
-                """
-config:
+                """config:
     ip_to_location: false
-    api_key: ''"""
+    api_key: ''
+
+database:
+    engine: 'sqlite'
+    name: ''
+    host: ''
+    port: ''
+    user: ''
+    password: ''"""
             )
         LOG.critical(
             "`config.yaml` was not found, a template has been created."
@@ -67,12 +102,10 @@ config:
         )
         return False
 
-    return True
-
 
 # Validate the options within config.yaml
 def validate_config(file_contents):
-    global IP_TO_LOCATION, API_KEY
+    global IP_TO_LOCATION, API_KEY, DB_NAME, DB_ENGINE, DB_HOST, DB_PORT, DB_USER, DB_PASSWORD
     config = yaml.safe_load(file_contents)
 
     try:
@@ -88,5 +121,31 @@ def validate_config(file_contents):
     if IP_TO_LOCATION:
         if not config["config"]["api_key"]:
             LOG.error("API_KEY is not set")
+            return False
         else:
             API_KEY = config["config"]["api_key"]
+
+    #
+    # Set/Validate the DATABASE section of the config.yaml
+    #
+    if "database" in config:
+        if config["database"]["engine"] not in [
+            "sqlite",
+            "mysql",
+            "postgresql",
+        ]:
+            LOG.error(
+                "database_engine must be either 'sqlite', 'mysql', or"
+                " 'postgresql'"
+            )
+            return False
+        else:
+            DB_ENGINE = config["database"]["engine"]
+
+        DB_NAME = config["database"]["name"]
+        DB_HOST = config["database"]["host"]
+        DB_PORT = config["database"]["port"]
+        DB_USER = config["database"]["user"]
+        DB_PASSWORD = config["database"]["password"]
+
+    return True
