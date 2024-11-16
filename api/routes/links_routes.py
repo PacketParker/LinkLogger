@@ -57,7 +57,7 @@ async def create_link(
                 link=link_path,
                 owner=current_user.id,
                 redirect_link=url.url,
-                expire_date=datetime.datetime.utcnow()
+                expire_date=datetime.datetime.today()
                 + datetime.timedelta(days=30),
             )
             db.add(new_link)
