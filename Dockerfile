@@ -23,4 +23,4 @@ COPY --from=build-ui /app/dist /usr/share/nginx/html
 # Replace the default site with the LinkLogger config
 COPY nginx.conf /etc/nginx/sites-enabled/default
 
-CMD ["./linklogger.sh"]
+CMD ["./docker_start.sh"]
