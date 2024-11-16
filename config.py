@@ -1,7 +1,6 @@
 import jsonschema
 import os
 import yaml
-import sys
 import logging
 from colorlog import ColoredFormatter
 
@@ -66,7 +65,9 @@ config:
             "`config.yaml` was not found, a template has been created."
             " Please fill out the necessary information and restart."
         )
-        sys.exit()
+        return False
+
+    return True
 
 
 # Validate the options within config.yaml
@@ -78,7 +79,7 @@ def validate_config(file_contents):
         jsonschema.validate(config, schema)
     except jsonschema.ValidationError as e:
         LOG.error(e.message)
-        sys.exit()
+        return False
 
     # Make IP_TO_LOCATION a boolean
     IP_TO_LOCATION = bool(config["config"]["ip_to_location"])

@@ -12,6 +12,7 @@ LABEL maintainer="parker <mailto:contact@pkrm.dev>"
 
 WORKDIR /
 COPY . .
+RUN chmod +x linklogger.sh
 RUN pip install -r requirements.txt
 
 RUN apt-get update && apt-get install -y nginx && \
@@ -22,4 +23,4 @@ COPY --from=build-ui /app/dist /usr/share/nginx/html
 # Replace the default site with the LinkLogger config
 COPY nginx.conf /etc/nginx/sites-enabled/default
 
-CMD service nginx start && python -u linklogger.py
+CMD ["./linklogger.sh"]
