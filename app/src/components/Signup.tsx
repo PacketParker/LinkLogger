@@ -6,7 +6,7 @@ import axios from 'axios';
 import Navbar from './Navbar';
 
 function Signup() {
-  document.title = 'LinkLogger | Signup';
+  document.title = 'LinkLogger | Create Account';
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -65,7 +65,7 @@ function Signup() {
     <>
       <Navbar />
       <div className={styles.container}>
-        <h1>Sign up</h1>
+        <h1>Create Account</h1>
         <h2 className={error ? styles.errorVisible : styles.errorHidden}>
           {error}
         </h2>

@@ -32,7 +32,7 @@ function Navbar() {
           <a className={styles.link}>Login</a>
         </Link>
         <Link to={'/signup'}>
-          <a className={styles.link}>Signup</a>
+          <a className={styles.link}>Create Account</a>
         </Link>
       </div>
       <div className={styles.right}>
