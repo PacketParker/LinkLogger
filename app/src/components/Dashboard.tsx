@@ -218,11 +218,7 @@ function Dashboard() {
               <tr>
                 <td colSpan={4}>
                   <div className={styles.noLinks}>
-                    You do not have any shortened links -{' '}
-                    <Link to="/create" className={styles.noLinksLink}>
-                      create one here
-                    </Link>
-                    .
+                    You do not have any shortened links, create one above.
                   </div>
                 </td>
               </tr>
