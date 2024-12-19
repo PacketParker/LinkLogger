@@ -45,7 +45,6 @@ def authenticate_user(db, username: str, password: str):
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
-        print("WHY")
         return False
     return user
 
