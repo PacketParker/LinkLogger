@@ -10,3 +10,4 @@ SQLAlchemy==2.0.31
 validators==0.28.3
 requests==2.32.3
 ua-parser==0.18.0
+APScheduler==3.11.0

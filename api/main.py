@@ -6,10 +6,31 @@ from api.routes.links_routes import router as links_router
 from api.routes.user_routes import router as user_router
 from api.routes.log_routes import router as log_router
 from typing import Annotated
+from apscheduler.schedulers.background import BackgroundScheduler
+from contextlib import asynccontextmanager
 
 from api.util.db_dependency import get_db
+from api.util.clean_db import clean_db
 from api.util.log import log
 from models import Link
+from config import LOG
+
+scheduler = BackgroundScheduler()
+
+
+# Handle the database cleanup scheduler
+def start_scheduler():
+    scheduler.add_job(clean_db, "interval", days=1)
+    scheduler.start()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        start_scheduler()
+        yield
+    finally:
+        scheduler.shutdown()
 
 
 app = FastAPI(
@@ -21,6 +42,7 @@ app = FastAPI(
         "identifier": "Unlicense",
         "url": "https://unlicense.org",
     },
+    lifespan=lifespan,
 )
 
 app.add_middleware(
