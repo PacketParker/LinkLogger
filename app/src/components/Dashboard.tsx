@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import axios from 'axios';
 import styles from '../styles/Dashboard.module.css';
 import { useNavigate, Link } from 'react-router-dom';
@@ -28,12 +28,51 @@ function Dashboard() {
     expire_date: string;
   }
 
+  // Link creation states
+  const [link, setLink] = useState('');
+  const [url, setURL] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Log and link states
   const [links, setLinks] = useState<Link[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [visibleLog, setVisibleLog] = useState<string | null>(null);
   const [loadingLinks, setLoadingLinks] = useState<boolean>(true); // Track loading state for links
   const [loadingLogs, setLoadingLogs] = useState<boolean>(true); // Track loading state for logs
   const navigate = useNavigate();
+
+  // Handle form submission to create a new link
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const res = await axios.post('/api/links', { url });
+      if (res.status === 200) {
+        setLink(res.data.link);
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const customErrorMessage = error.response?.data?.error || null;
+        setError(customErrorMessage || 'An error occurred. Please try again.');
+        setIsSubmitting(false);
+      } else {
+        setError('Unknown error. Please try again.');
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  // Copy the link to the clipboard
+  const copyLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/c/${link}`);
+    setIsCopied(true);
+    // Wait 5 seconds, then set isCopied back to false
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 5000);
+  };
 
   // Fetch links from API
   useEffect(() => {
@@ -130,6 +169,36 @@ function Dashboard() {
   return (
     <>
       <Navbar />
+
+      <div className={styles.createContainer}>
+        <h1>Create a new short link by entering the long URL below</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Full URL"
+            value={url}
+            onChange={(e) => setURL(e.target.value)}
+            required
+          />
+          {link.length === 0 ? (
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating...' : 'Create'}
+            </button>
+          ) : (
+            <button type="button" onClick={copyLink}>
+              {isCopied ? (
+                <em>Copied!</em>
+              ) : (
+                `Click to copy: ${window.location.origin}/c/${link}`
+              )}
+            </button>
+          )}
+        </form>
+        <p className={error ? styles.errorVisible : styles.errorHidden}>
+          {error}
+        </p>
+      </div>
+
       {/* Show loading spinner if either links or logs are still loading */}
       {loadingLinks || loadingLogs ? (
         <LoadingSpinner />
