@@ -5,6 +5,61 @@ body {
     background-color: #2c3338;
 }
 
+.createContainer {
+    margin: 25px auto 25px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 1000px;
+}
+
+.createContainer h1 {
+    font-size: 25px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.createContainer form {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.createContainer form input {
+    display: block;
+    margin: 10px auto;
+    width: 60%;
+    box-sizing: border-box;
+    border-radius: 5px;
+    padding: 15px;
+    font-size: 17px;
+    color: #ccc;
+    background-color: #3b4148;
+    border: none;
+}
+
+.createContainer form button {
+    width: 40%;
+}
+
+.errorVisible {
+    visibility: visible;
+    color: #ee6161;
+    font-weight: 600;
+    word-wrap: break-word;
+    width: 100%;
+    text-align: center;
+    font-size: 17px;
+    margin: 0 auto;
+}
+
+.errorHidden {
+    visibility: hidden;
+    color: #ee6161;
+}
+
 .loadingSpinner {
   display: flex;
   flex-direction: column;
@@ -56,7 +111,6 @@ table td {
 
 .mainTable {
     position: absolute;
-    top: 150px;
     left: 50%;
     transform: translateX(-50%);
 }
