@@ -66,9 +66,9 @@ function Signup() {
       <Navbar />
       <div className={styles.container}>
         <h1>Create Account</h1>
-        <h2 className={error ? styles.errorVisible : styles.errorHidden}>
+        <p className={error ? styles.errorVisible : styles.errorHidden}>
           {error}
-        </h2>
+        </p>
         <hr></hr>
         <form onSubmit={handleSubmit}>
           <input
