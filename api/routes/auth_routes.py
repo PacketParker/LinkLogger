@@ -43,7 +43,7 @@ async def login_for_access_token(
         key="access_token",
         value=access_token,
         httponly=True,  # Prevents client-side access
-        # secure=True,  # Cookies are only sent over HTTPS
+        secure=True,  # Cookies are only sent over HTTPS
     )
     return response
 
