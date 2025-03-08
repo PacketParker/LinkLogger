@@ -92,7 +92,7 @@ database:
     engine: 'sqlite'
     name: ''
     host: ''
-    port: ''
+    port: 0
     user: ''
     password: ''"""
             )
