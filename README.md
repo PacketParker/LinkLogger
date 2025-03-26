@@ -42,7 +42,7 @@ To run LinkLogger on Docker, check out the [docker-compose.yaml](docker-compose.
 
 If you want to work on the LinkLogger source, or just want to run the project on bare metal, follow the instructions below:
 
-1. Install python3 (preferably >3.10) & pip
+1. Install python3.10 & pip (other python versions may work, but are currently untested)
 2. Install Node.js
 3. Install Yarn
 4. Install API dependencies (pip install -r requirements.txt)
